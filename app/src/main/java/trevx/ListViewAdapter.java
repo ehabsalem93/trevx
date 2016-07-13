@@ -1,6 +1,7 @@
 package trevx;
 
 import android.content.Context;
+import android.support.v7.widget.AppCompatImageButton;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +30,22 @@ public class ListViewAdapter extends ArrayAdapter<String> {
     public View getView(final int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+
         View rowView = inflater.inflate(R.layout.search_static_list_item, parent, false);
+
+        final String query = values.get(position);
+
+        AppCompatImageButton auto = (AppCompatImageButton) rowView.findViewById(R.id.auto);
+        auto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MainActivity.searchViewLayout.setExpandedText(query + " ");
+
+            }
+        });
+
+
         rowView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -44,6 +60,8 @@ public class ListViewAdapter extends ArrayAdapter<String> {
         });
         TextView textView = (TextView) rowView.findViewById(R.id.card_details);
         textView.setText(values.get(position));
+
+
         return rowView;
     }
 }

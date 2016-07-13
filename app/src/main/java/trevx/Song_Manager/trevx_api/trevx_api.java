@@ -18,7 +18,6 @@ import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import trevx.Search.Search_FRagment_Adapter1;
 import trevx.Search.Search_Fragment;
 import trevx.Song_Manager.Song;
 
@@ -79,7 +78,7 @@ public class trevx_api implements Serializable{
 
         Log.d(TAG,"Size of song before loading is "+song_list.size());
        // Log.d(TAG, "inside api" + "http://trevx.com/v1/" + URLEncoder.encode(query, "UTF-8") + "/20/20/?format=json");
-        URL url = new URL("http://trevx.com/v1/"+ URLEncoder.encode(query, "UTF-8")+"/"+current+"/"+(20)+"/?format=json");
+        URL url = new URL("http://trevx.com/v1/" + URLEncoder.encode(query, "UTF-8") + "/" + current + "/20/?format=json");
 
        Log.d(TAG,"Loading uyrls     "+url);
 
@@ -121,7 +120,7 @@ public class trevx_api implements Serializable{
                 }
 
             }
-            Search_FRagment_Adapter1.song_list=song_list;
+
             Log.d(TAG,"song list after loading are"+song_list.size()+"   "+song_list.toString());
 
         } catch (JSONException ex) {

@@ -72,7 +72,7 @@ android:id="@+id/full_player"
     </RelativeLayout>
 
     <include
-        android:id="@+id/toolbar"
+        android:id="@+id/toolbar1"
         layout="@layout/player_toolbar"></include>
 
 
@@ -173,7 +173,7 @@ android:id="@+id/full_player"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:src="@drawable/share"
-                android:visibility="visible"
+                android:visibility="gone"
                 />
 
             <ImageView
@@ -275,7 +275,7 @@ android:id="@+id/full_player"
                     android:layout_alignParentTop="true"
                     android:layout_gravity="center"
                     android:indeterminate="true"
-                    android:visibility="gone" />
+                    android:visibility="visible" />
 
 
             </FrameLayout>

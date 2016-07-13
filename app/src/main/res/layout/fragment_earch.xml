@@ -1,7 +1,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     tools:context="trevx.Search.Search_Fragment"
 
     >
@@ -19,6 +19,6 @@
         android:layout_gravity="left|bottom"
         android:layout_marginTop="110dp"
 
-        android:background="@color/black_p50" />
+        android:background="@color/sub" />
 
 </FrameLayout>

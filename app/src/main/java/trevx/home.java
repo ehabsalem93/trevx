@@ -8,6 +8,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.redbooth.SlidingDeck;
+
+import trevx.Song_Manager.Song;
+import trevx.Song_Manager.trevx_api.Suggesion;
 import trevx.com.trevx.R;
 
 
@@ -24,13 +28,13 @@ public class home extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
+    public static SlidingDeck slidingDeck;
+    Context context;
+    View view;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-
     private OnFragmentInteractionListener mListener;
-
     public home() {
         // Required empty public constructor
     }
@@ -53,6 +57,23 @@ public class home extends Fragment {
         return fragment;
     }
 
+    public static void setApater() {
+        if (Suggesion.Suggestionword != null) {
+            ListViewAdapter f = new ListViewAdapter(MainActivity.context, Suggesion.Suggestionword);
+
+            slidingDeck.setAdapter(f);
+            slidingDeck.setAnimationDuration(5000);
+
+            slidingDeck.setSwipeEventListener(new SlidingDeck.SwipeEventListener() {
+                @Override
+                public void onSwipe(SlidingDeck parent, View item) {
+                    Song model = (Song) item.getTag();
+                    Suggesion.Suggestionword.remove(Suggesion.Suggestionword.size());
+                }
+            });
+        }
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,7 +87,10 @@ public class home extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home2, container, false);
+        view = inflater.inflate(R.layout.fragment_home2, container, false);
+        slidingDeck = (SlidingDeck) view.findViewById(R.id.slidingDeck);
+        setApater();
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event

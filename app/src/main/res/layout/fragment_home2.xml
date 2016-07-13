@@ -2,12 +2,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-   tools:context="trevx.home">
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/hello_blank_fragment"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+    tools:context="trevx.home">
 
+  <com.redbooth.SlidingDeck
+      android:id="@+id/slidingDeck"
+      android:layout_width="match_parent"
+      android:layout_height="200dp" />
 </RelativeLayout>

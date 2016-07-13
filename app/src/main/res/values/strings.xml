@@ -19,4 +19,13 @@
     <string name="configure">Configure</string>
     <string name="add_widget">Add widget</string>
     <string name="lorem_1">Ehab Salem</string>
+
+
+    <string name="header_text">The Header</string>
+    <string name="footer_text">The Footer</string>
+
+    <!--footer-->
+    <string name="list_footer_loading">Loading…</string>
+    <string name="list_footer_network_error">Network Error Connection</string>
+    <string name="list_footer_end">End</string>
 </resources>

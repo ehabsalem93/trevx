@@ -37,7 +37,7 @@ public class MusicIntentReceiver extends BroadcastReceiver {
             // send an intent to our MusicService to telling it to pause the audio
             try {
                 if (MusicService.mPlayer != null) {
-                Intent i=new Intent(MusicService.ACTION_PLAY);
+                    Intent i = new Intent(MusicService.ACTION_PAUSE);
                 i.setPackage(context.getPackageName());
                     context.startService(i);
                 }

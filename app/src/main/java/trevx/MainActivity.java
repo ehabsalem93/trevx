@@ -30,7 +30,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
 import android.telephony.TelephonyManager;
 import android.text.Editable;
 import android.util.Log;
@@ -62,8 +61,8 @@ import trevx.Song_Manager.Song;
 import trevx.Song_Manager.get_Song_trevx;
 import trevx.Song_Manager.trevx_api.Suggesion;
 import trevx.Song_Manager.trevx_api.getSuggestion;
-import trevx.full_Music_PLayer.media_player_visual;
 import trevx.com.trevx.R;
+import trevx.full_Music_PLayer.media_player_visual;
 import trevx.util.Internet_connectivity;
 import trevx.util.String_ytil;
 
@@ -83,7 +82,9 @@ public class MainActivity extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     public static ViewPager mViewPager;
-    static SearchViewLayout searchViewLayout;
+
+    public static SearchViewLayout searchViewLayout;
+    public static Context context;
     final Messenger mMessenger = new Messenger(new IncomingHandler());
     ProgressBar progressBar1;
     boolean is_completed = false;
@@ -99,7 +100,6 @@ public class MainActivity extends AppCompatActivity {
     AppCompatImageButton plaButton, puaButton;
     AppCompatImageView image;
     MenuItem fav;
-    Toolbar toolbar;
     String sug;
     Runnable tunsug = new Runnable() {
         public void run() {
@@ -181,9 +181,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                 } else if (MusicService.mState == MusicService.State.Playing) {
-                    seek.setMax(MusicService.mPlayer.getDuration());
-
-                    seek.setProgress(MusicService.mPlayer.getCurrentPosition());
+                    sendMessageToService(1);
 
 
                     if (mIsBound)
@@ -194,9 +192,6 @@ public class MainActivity extends AppCompatActivity {
                     progressBar1.setVisibility(View.GONE);
                     puaButton.setVisibility(View.VISIBLE);
                     plaButton.setVisibility(View.GONE);
-                    //      Title.setText(new String_ytil().edit_songName(MusicService.Name));
-                    //       Title.setText(new  String_ytil().edit_songName(new String_ytil().getHostName(MusicService.Link)));
-                    //  image.setImageBitmap(MusicService.pm);
 
                 } else if (MusicService.mState == MusicService.State.Paused) {  //if(!ispause)
                     {
@@ -214,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
 
 
             if (!stop)
-                myHandler.postDelayed(this, 100);
+                myHandler.postDelayed(this, 1000);
         }
     };
     private Boolean exit = false;
@@ -241,7 +236,8 @@ public class MainActivity extends AppCompatActivity {
         //If the service is running when the activity starts, we want to automatically bind to it.
         if (!MusicService.isRunning() && !mIsBound) {
             doBindService();
-            mIsBound=true;
+            Log.d(TAG, "Binding Main Activity into service");
+
         }
     }
 
@@ -251,6 +247,20 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     Log.d(TAG, "Sending message");
                     Message msg = Message.obtain(null, MusicService.MSG_SET_INT_VALUE, 1, 0);
+                    msg.replyTo = mMessenger;
+                    mService.send(msg);
+                } catch (RemoteException e) {
+                }
+            }
+        }
+    }
+
+    private void sendMessageToService_play_pause(int intvaluetosend) {
+        if (mIsBound) {
+            if (mService != null) {
+                try {
+                    Log.d(TAG, "Sending message to play_pause the song");
+                    Message msg = Message.obtain(null, MusicService.MSG_SET_INT_VALUE, intvaluetosend, 0);
                     msg.replyTo = mMessenger;
                     mService.send(msg);
                 }
@@ -277,8 +287,6 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "file name from mesanger: " + song_name);
             Log.d(TAG, "url from mesanger: " + link);
             Log.d(TAG, "imagefrom mesanger: " + pm);
-
-
             msg.replyTo = mMessenger;
             mService.send(msg);
         } catch (RemoteException e) {
@@ -347,11 +355,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         try {
+            context = this;
+            if (!MusicService.isRunning) {
+                Intent i = new Intent(MainActivity.this, MusicService.class);
+                i.setPackage(getPackageName());
 
-            Intent i = new Intent(MainActivity.this, MusicService.class);
-            i.setPackage(getPackageName());
-            startService(i);
-            Log.d(TAG, "Service intieted");
+                startService(i);
+
+                Log.d(TAG, "Service intieted");
+            } else {
+                Log.d(TAG, "Service  already intieted");
+
+            }
+
             CheckIfServiceIsRunning();
             Suggesion.Suggestionword = new ArrayList<String>();
 
@@ -387,11 +403,12 @@ public class MainActivity extends AppCompatActivity {
         searchViewLayout.invalidate();
         searchViewLayout.setBackgroundResource(R.color.black_overlay);
         searchViewLayout.setExpandedContentSupportFragment(this, new SearchStaticListSupportFragment());
-        searchViewLayout.handleToolbarAnimation(toolbar);
+        searchViewLayout.handleToolbarAnimation(tabLayout);
 
         searchViewLayout.setCollapsedHint(getApplicationContext(),"trevx");
 
         searchViewLayout.setExpandedHint("Search trevx...");
+
 //        searchViewLayout.setHint("Global Hint");
 
         ColorDrawable collapsed = new ColorDrawable(ContextCompat.getColor(this,R.color.colorPrimary));
@@ -409,6 +426,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onStart(boolean expanding) {
                 if (expanding) {
+
                     // MainActivity.fab.hide();
                     tabLayout.setVisibility(View.GONE);
                     // mViewPager.setVisibility(View.GONE);
@@ -459,7 +477,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        doUnbindService();
+
     }
 
     private void init_small_mediaPlayer() {
@@ -479,18 +497,15 @@ public class MainActivity extends AppCompatActivity {
         source= (TextView) findViewById(R.id.source);
 
         progressBar1 = (ProgressBar) findViewById(R.id.progressBar1);
-        layout=(RelativeLayout)findViewById(R.id.main_content);
+        layout = (RelativeLayout) findViewById(R.id.small_player_main);
         plaButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (null != MusicService.mPlayer) {
 
                     Log.d(TAG, "u clicked to pause the song");
-                    Intent serviceIntent = new Intent(MusicService.ACTION_PLAY);
-                    serviceIntent.setPackage(getPackageName());
-                    startService(serviceIntent);
-                    if (MusicService.mPlayer.isPlaying())
-                        MusicService.mState = MusicService.State.Playing;
+                    sendMessageToService_play_pause(2);
+
                 }
             }
         });
@@ -499,19 +514,14 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (null != MusicService.mPlayer) {
                     Log.d(TAG, "u clicked to play the song");
-                    Intent serviceIntent = new Intent(MusicService.ACTION_PAUSE);
-                    serviceIntent.setPackage(getPackageName());
-                    startService(serviceIntent);
-                    if (!MusicService.mPlayer.isPlaying())
-                        MusicService.mState = MusicService.State.Paused;
+                    sendMessageToService_play_pause(2);
+
                 }
             }
         });
 
 
-
-
-        RelativeLayout playbar = (RelativeLayout) findViewById(R.id.small_player_main);
+        RelativeLayout playbar = (RelativeLayout) findViewById(R.id.small_player);
 
         playbar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -528,19 +538,22 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSwipeRight() {
                 super.onSwipeRight();
-
+/*
                 Intent i2 = new Intent(MusicService.ACTION_REWIND);
                 i2.setPackage(getPackageName());
-                startService(i2);
+                startService(i2);*/
+                sendMessageToService_play_pause(3);
             }
 
             @Override
             public void onSwipeLeft() {
                 super.onSwipeLeft();
 
-                Intent i2 = new Intent(MusicService.ACTION_SKIP);
+              /*  Intent i2 = new Intent(MusicService.ACTION_SKIP);
                 i2.setPackage(getPackageName());
-                startService(i2);
+              //  startService(i2);
+              */
+                sendMessageToService_play_pause(3);
 
             }
 
@@ -563,67 +576,30 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void was_playing_before(String id, String song_name, String source, String pm, LinkedList<Song> songlist) {
-        {
-            RelativeLayout playbar = (RelativeLayout) findViewById(R.id.small_player_main);
-            playbar.setVisibility(View.VISIBLE);
-
-            Intent i;
-
-            Name = song_name;
-            ids = id;
-            imgs = pm;
-            Link = source;
-
-            MusicService.song_list = songlist;
-            i = new Intent(MusicService.ACTION_URL);
-           // i.setPackage(getPackageName());
-            i.putExtra("id", id);
-            i.putExtra("name", song_name);
-            i.putExtra("source", source);
-            i.putExtra("image", pm);
-            // Uri uri = Uri.parse(source);
-          //  i.setData(uri);
-
-            startService(i);
-
-            Title.setText(song_name);
-            this.source.setText(new String_ytil().edit_songName(new String_ytil().getHostName(source)));
-
-            // Glide.with(this).load(pm).asBitmap().into(image);
-        }
-    }
-
-    public void configure_small_player(String id, String song_name, String source, String pm, LinkedList<Song> songlist){
-
+    public void configure_small_player(String id, String song_name, String source, String pm, LinkedList<Song> songlist) {
+        call_full_player(id, song_name, source, pm);
         RelativeLayout playbar = (RelativeLayout) findViewById(R.id.small_player_main);
         playbar.setVisibility(View.VISIBLE);
+        Title.setText(new String_ytil().edit_songNamefor_small_player(song_name, 25));
+        this.source.setText(new String_ytil().edit_songName(new String_ytil().getHostName(source)));
 
-
-        Name=song_name;
+        MusicService.song_list = songlist;
+        send_action_url(id, song_name, source, pm);
+        Name = song_name;
          ids = id;
          imgs = pm;
         Link=source;
+
 
         Log.d(TAG,"id: "+id);
         Log.d(TAG,"file name: "+song_name);
         Log.d(TAG,"url: "+source);
         Log.d(TAG, "image: " + pm);
 
-        MusicService.song_list=songlist;
 
-        Title.setText(new String_ytil().edit_songNamefor_small_player(song_name,25));
-        this.source.setText(new String_ytil().edit_songName(new String_ytil().getHostName(source)));
-
-        send_action_url(id, song_name, source, pm);
-        call_full_player(id, song_name, source, pm);
+        //   call_full_player(id, song_name, source, pm);
        // Toast.makeText(getApplicationContext()," "+source+"   "+song_name,Toast.LENGTH_LONG).show();
 
-        //startService(i);
-
-
-
-        // Glide.with(this).load(pm).asBitmap().into(image);
 
 
     }
@@ -662,12 +638,11 @@ public void send_email(String text)
     private void init_whole_app_interface() {
         //resize the screen to full
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.main_container);
+
         Favourite_Main_API.define_lis(getApplicationContext());
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setLogo(R.drawable.logo);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
@@ -680,12 +655,27 @@ public void send_email(String text)
         tabLayout.getTabAt(1).setIcon(R.drawable.ic_view_list_white_24dp);
         tabLayout.getTabAt(1).setText("");
 
-
+        mViewPager.setPageTransformer(false, new DepthPageTransformer());
         tabLayout.getTabAt(0).setIcon(R.drawable.ic_whatshot_white_24dp);
         tabLayout.getTabAt(0).setText("");
         TelephonyManager tm = (TelephonyManager) this.getSystemService(TELEPHONY_SERVICE);
         String countryCodeValue = tm.getNetworkCountryIso();
         seek= (DiscreteSeekBar) findViewById(R.id.seek);
+
+        seek.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+
+                if (MusicService.mPlayer.isPlaying()) {
+                    //  P sb= (DiscreteSeekBar) view;
+                    int playPositionInMillisecconds = seek.getProgress();
+
+                    Log.d(TAG, "duraion" + MusicService.mPlayer.getDuration());
+                    MusicService.mPlayer.seekTo(playPositionInMillisecconds);
+                }
+                return false;
+            }
+        });
 
       //  Toast.makeText(getApplicationContext(),countryCodeValue,Toast.LENGTH_LONG).show();
 
@@ -816,9 +806,9 @@ public void send_email(String text)
     @Override
     protected void onResume() {
         super.onResume();
-        stop = false;
+        //  stop = false;
 
-        CheckIfServiceIsRunning();
+        //  CheckIfServiceIsRunning();
 
     }
 
@@ -828,10 +818,10 @@ public void send_email(String text)
         super.onDestroy();
         try{
             mIsBound=false;
-
+            doUnbindService();
             stopService(new Intent(this,MusicService.class));
         stop=true;
-
+            Glide.get(MainActivity.this).clearMemory();
 
        // doUnbindService();
         }catch(Exception e)
@@ -880,13 +870,16 @@ public void send_email(String text)
         }
     }
 
+
     class IncomingHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case MusicService.MSG_SET_INT_VALUE:
-                    seek.setProgress(msg.getData().getInt("cur"));
-                    seek.setMax(msg.getData().getInt("max"));
+                    if (seek != null) {
+                        seek.setProgress(msg.getData().getInt("cur"));
+                        seek.setMax(msg.getData().getInt("max"));
+                    }
                     break;
                 case MusicService.MSG_SET_STRING_VALUE:
                     //  String str1 = msg.getData().getString("str1");
@@ -950,6 +943,43 @@ public void send_email(String text)
 
             }
             return null;
+        }
+    }
+
+    public class DepthPageTransformer implements ViewPager.PageTransformer {
+        private static final float MIN_SCALE = 0.75f;
+
+        public void transformPage(View view, float position) {
+            int pageWidth = view.getWidth();
+
+            if (position < -1) { // [-Infinity,-1)
+                // This page is way off-screen to the left.
+                view.setAlpha(0);
+
+            } else if (position <= 0) { // [-1,0]
+                // Use the default slide transition when moving to the left page
+                view.setAlpha(1);
+                view.setTranslationX(0);
+                view.setScaleX(1);
+                view.setScaleY(1);
+
+            } else if (position <= 1) { // (0,1]
+                // Fade the page out.
+                view.setAlpha(1 - position);
+
+                // Counteract the default slide transition
+                view.setTranslationX(pageWidth * -position);
+
+                // Scale the page down (between MIN_SCALE and 1)
+                float scaleFactor = MIN_SCALE
+                        + (1 - MIN_SCALE) * (1 - Math.abs(position));
+                view.setScaleX(scaleFactor);
+                view.setScaleY(scaleFactor);
+
+            } else { // (1,+Infinity]
+                // This page is way off-screen to the right.
+                view.setAlpha(0);
+            }
         }
     }
 

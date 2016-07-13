@@ -1,47 +1,35 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
 
-    android:alpha="0.9"
+    xmlns:tools="http://schemas.android.com/tools"
 
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:alpha="0.9"
     tools:context="trevx.Favourite.Favourite_Fragment">
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/favorite_unfilled"
         android:layout_above="@+id/noresult"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/favorite_unfilled" />
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@id/main_content"
-        android:visibility="visible">
 
 <android.support.v7.widget.RecyclerView
+    android:id="@+id/rv"
     android:layout_width="match_parent"
+
     android:layout_height="match_parent"
 
-    android:id="@+id/rv"
-
-    android:visibility="visible">
-
-    <!-- TODO: Update blank fragment layout -->
-
-
-
-
-</android.support.v7.widget.RecyclerView></android.support.v4.widget.SwipeRefreshLayout>
+    android:visibility="visible" />
     <TextView
+        android:id="@+id/noresult"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="there is no content to be viewed"
-        android:fontFamily="sans-serif-smallcaps"
-        android:layout_centerVertical="true"
-        android:textColor="@color/subtext"
         android:layout_centerHorizontal="true"
-        android:id="@+id/noresult" />
+        android:layout_centerVertical="true"
+        android:fontFamily="sans-serif-smallcaps"
+        android:text="there is no content to be viewed"
+        android:textColor="@color/subtext" />
 </RelativeLayout>

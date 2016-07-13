@@ -134,10 +134,8 @@ public class MusicService extends Service implements MediaPlayer.OnBufferingUpda
     public String Name, id;
     public String image, Link;
     MediaSessionCompat _mediaSession;
-    boolean is_completed = false;
     Intent actionTogglePlayBack;
-    Intent actionSKIP;
-    Intent actionrewind;
+
     // our AudioFocusHelper object, if it's available (it's available on SDK level >= 8)
     // If not available, this will be null. Always check for null before using!
     AudioFocusHelper mAudioFocusHelper = null;
@@ -229,8 +227,10 @@ public class MusicService extends Service implements MediaPlayer.OnBufferingUpda
                 //Send data as a String
                 Bundle b = new Bundle();
                 try {
-                    b.putInt("cur", mPlayer.getCurrentPosition());
-                    b.putInt("max", mPlayer.getDuration());
+                    if (mPlayer != null && (mState != State.Stopped || mState != State.Preparing || mState != State.Retrieving)) {
+                        b.putInt("cur", mPlayer.getCurrentPosition());
+                        b.putInt("max", mPlayer.getDuration());
+                    }
                 } catch (Exception e) {
                     b.putInt("cur", 0);
                     b.putInt("max", 0);
@@ -324,7 +324,8 @@ public class MusicService extends Service implements MediaPlayer.OnBufferingUpda
     public int onStartCommand(Intent intent, int flags, int startId) {
         String action = intent.getAction();
 if(action!=null){
-        if (action.equals(ACTION_TOGGLE_PLAYBACK)) processTogglePlaybackRequest();
+    if (action.equals(ACTION_TOGGLE_PLAYBACK))
+        processTogglePlaybackRequest();
         else if (action.equals(ACTION_PLAY)) processPlayRequest();
         else if (action.equals(ACTION_PAUSE)) processPauseRequest();
         else if (action.equals(ACTION_SKIP)) processSkipRequest();
@@ -384,8 +385,9 @@ if(action!=null){
         }
         if (mState == State.Playing) {
             // Pause media player and cancel the 'foreground service' state.
-            mState = State.Paused;
+
             mPlayer.pause();
+            mState = State.Paused;
             if (mPlayer.isPlaying())
                 //       Shaked_Device.shaked_device.start_Detection(this);
                 relaxResources(false); // while paused, we always retain the MediaPlayer
@@ -547,6 +549,7 @@ if(action!=null){
             // is State.Playing. But we stay in the Playing state so that we know we have to resume
             // playback once we get the focus back.
             if (mPlayer.isPlaying()) mPlayer.pause();
+            mState = State.Paused;
             return;
         } else if (mAudioFocus == AudioFocus.NoFocusCanDuck)
             mPlayer.setVolume(DUCK_VOLUME, DUCK_VOLUME);  // we'll be relatively quiet
@@ -555,27 +558,25 @@ if(action!=null){
         if (!mPlayer.isPlaying()) {
             mPlayer.start();
             setUpAsForeground("");
+            mState = State.Playing;
             //    if(mPlayer.isPlaying())
             //        Shaked_Device.shaked_device.start_Detection(this);
         }
     }
 
     void processAddRequest(Bundle intent) {
-
-        mState = State.Stopped;
-
         id = intent.getString("id");
         Name = intent.getString("name");
         image = intent.getString("image");
         Link = intent.getString("source");
-    //    Toast.makeText(getApplicationContext(),"Got the song",Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "Process Add Request");
         sendMessageToActivity(Name, Link, image, id);
         if (mState == State.Retrieving) {
-            // we'll play the requested URL right after we finish retrieving
             mWhatToPlayAfterRetrieve = Uri.parse(Link);
             mStartPlayingAfterRetrieve = true;
         } else if (mState == State.Playing || mState == State.Paused || mState == State.Stopped) {
             Log.i(TAG, "Playing from URL/path: " + Name);
+            mState = State.Retrieving;
             tryToGetAudioFocus();
             playNextSong(Link);
         }
@@ -604,14 +605,6 @@ if(action!=null){
 
         relaxResources(false); // release everything except MediaPlayer
 
-        if (manualUrl != null) {
-            // set the source of the media player to a manual URL or path
-
-
-        }
-
-        //   mState = State.Preparing;
-        //   setUpAsForeground(" (loading)");
         try {
             Picasso.with(this).load(image).into(target);
 
@@ -633,7 +626,7 @@ if(action!=null){
             createMediaPlayerIfNeeded();
             mPlayer.setDataSource(manualUrl);
             mIsStreaming = manualUrl.startsWith("http:") || manualUrl.startsWith("https:");
-
+            mState = State.Preparing;
             mPlayer.prepareAsync();
         } catch (Exception e) {
             Toast.makeText(getApplicationContext(), "Error" + manualUrl + e.toString(), Toast.LENGTH_SHORT).show();
@@ -673,7 +666,7 @@ if(action!=null){
      */
     public void onPrepared(MediaPlayer player) {
         // The media player is done preparing. That means we can start playing!
-        mState = State.Playing;
+
 
         // updateNotification(Name + " (playing)");
         configAndStartMediaPlayer();
@@ -773,11 +766,7 @@ if(action!=null){
                     .build();
             startForeground(NOTIFICATION_ID, notificationa);
        //     startForeground(NOTIFICATION_ID, notificationa);
-        } else if (!mPlayer.isPlaying() || is_completed) {
-            //if (is_completed)
-
-
-
+        } else if (!mPlayer.isPlaying()) {
             notificationa = new Notification.Builder(this)
                     // Show controls on lock screen even when user hides sensitive content.
                     .setVisibility(Notification.VISIBILITY_PUBLIC)
@@ -812,15 +801,6 @@ if(action!=null){
 
             stopForeground(true);
             mNotificationManager.notify(NOTIFICATION_ID, notificationa);
-         //   startForeground(NOTIFICATION_ID, notificationa);
-            //Notification notification=mNotificationBuilder.build();
-
-
-            //   if (mState == State.Playing || mState==State.Paused )
-
-
-            //  mNotificationManager.notify(NOTIFICATION_ID,  build());
-
 
         }
 
@@ -934,36 +914,6 @@ if(action!=null){
 
     }
 
-    private void lockScreenControls() {
-
-        // Use the media button APIs (if available) to register ourselves for media button
-
-
-        MediaButtonHelper.registerMediaButtonEventReceiverCompat(mAudioManager, mMediaButtonReceiverComponent);
-        ComponentName myEventReceiver = new ComponentName(getPackageName(), MusicIntentReceiver.class.getName());
-        // Use the remote control APIs (if available) to set the playback state
-        if (mRemoteControlClientCompat == null) {
-            Intent intent = new Intent(Intent.ACTION_MEDIA_BUTTON);
-            intent.setComponent(myEventReceiver);
-            mRemoteControlClientCompat = new RemoteControlClientCompat(PendingIntent.getBroadcast(this /*context*/, 0 /*requestCode, ignored*/, intent /*intent*/, 0 /*flags*/));
-            RemoteControlHelper.registerRemoteControlClient(mAudioManager, mRemoteControlClientCompat);
-        }
-        mRemoteControlClientCompat.setPlaybackState(RemoteControlClient.PLAYSTATE_PLAYING);
-        mRemoteControlClientCompat.setTransportControlFlags(
-                RemoteControlClient.FLAG_KEY_MEDIA_PLAY_PAUSE
-        );
-
-        //update remote controls
-        mRemoteControlClientCompat.editMetadata(true)
-
-                .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, Name)
-                //.putLong(MediaMetadataRetriever.METADATA_KEY_DURATION,playingItem.getDuration())
-                // TODO: fetch real item artwork
-
-                .apply();
-
-
-    }
 
     /**
      * Called when there's an error playing media. When this happens, the media player goes to
@@ -1050,21 +1000,6 @@ if(action!=null){
         }
     }
 
-    public Bitmap getBitmapFromURL(String src) {
-        try {
-            java.net.URL url = new java.net.URL(src);
-            HttpURLConnection connection = (HttpURLConnection) url
-                    .openConnection();
-            connection.setDoInput(true);
-            connection.connect();
-            InputStream input = connection.getInputStream();
-            Bitmap myBitmap = BitmapFactory.decodeStream(input);
-            return myBitmap;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 
     // indicates the state our service:
     public enum State {
@@ -1150,13 +1085,19 @@ if(action!=null){
                                         RemoteControlClientCompat.MetadataEditorCompat.METADATA_KEY_ARTWORK,
                                         pm)
                                 .apply();
-                        // sendMessageToActivity();
-
                         processAddRequest(bundle);
 
                     } else if (incrementby == 1) {
                         sendMessageToUI();
-                    }
+                    } else if (incrementby == 2) {
+                        Log.d(TAG, "playing or pausing");
+
+                        processTogglePlaybackRequest();
+                    } else if (incrementby == 3) {
+                        processRewindRequest();
+                    } else if (incrementby == 4)
+                        processSkipRequest();
+
 
                 }
                 break;

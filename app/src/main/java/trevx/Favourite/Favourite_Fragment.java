@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -43,7 +42,7 @@ public class Favourite_Fragment extends Fragment {
     public static String TAG="Favourite_Fragment";
     View view;
     Context context;
-    SwipeRefreshLayout swipe;
+
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -134,16 +133,8 @@ public class Favourite_Fragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_favourite, container, false);
          context = view.getContext();
 
-        swipe= (SwipeRefreshLayout) view.findViewById(R.id.main_content);
-        swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                setAdapterf(view);
-                swipe.setRefreshing(false);
-            }
-        });
 
-setAdapterf(view);
+        setAdapterf(view);
 
         LocalBroadcastManager.getInstance(context).registerReceiver(
                 mMessageReceiver, new IntentFilter("AddtoFavourite"));
@@ -180,7 +171,7 @@ setAdapterf(view);
                         // Toast.makeText(context,+"",Toast.LENGTH_LONG).show();
 
 
-                        Favourite_Main_API.removesong(viewHolder.getPosition());
+                        Favourite_Main_API.removesong(viewHolder.getAdapterPosition());
                         adapter.notifyItemRemoved(swipeDir);
                         //Toast.makeText(context,"Swiped number"+ swipeDir,Toast.LENGTH_SHORT).show();
                         adapter.notifyDataSetChanged();

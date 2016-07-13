@@ -1,5 +1,6 @@
 package trevx.full_Music_PLayer;
 
+import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -7,7 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.media.MediaPlayer;
-import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -15,6 +16,7 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
+import android.transition.Slide;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -37,8 +39,8 @@ import trevx.Favourite.Favourite_Fragment;
 import trevx.Favourite.Favourite_Main_API;
 import trevx.Musicplayer.MusicService;
 import trevx.Song_Manager.Song;
-import trevx.imageLoader.Song_Image_loader;
 import trevx.com.trevx.R;
+import trevx.imageLoader.Song_Image_loader;
 import trevx.util.String_ytil;
 
 
@@ -51,38 +53,30 @@ public class media_player_visual extends SwipeBackActivity {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     public static Context context;
-    private SeekBar bar ;
-    private int i = 0;
-
+    public static Intent i1 = new Intent(MusicService.ACTION_URL);
+    final Messenger mMessenger = new Messenger(new IncomingHandler());
     boolean issekset = false;
     boolean ispause = false;
-    private Handler myHandler = new Handler();
     boolean stop = false;
     TextView current_pos;
-    ImageView repeat, repeat1, shuffle, shuffle1, fav, fav1, share, share1, play, pause,Next,Pre,song_image;
+    ImageView repeat;
+    ImageView repeat1;
+    ImageView shuffle;
+    ImageView shuffle1;
+    ImageView fav;
+    ImageView fav1;
+    ImageView share;
+    ImageView share1;
+    ImageView play;
+    ImageView pause;
+    ImageView Next;
+    ImageView Pre;
+    ImageView song_image;
     TextView source,song_name,duration;
-    private RelativeLayout baseLayout;
-    public static Intent i1 = new Intent(MusicService.ACTION_URL);
     boolean is_completed = false;
     int bufferef = 0;
     ProgressBar waiting;
-    private int previousFingerPosition = 0;
-    private int baseLayoutPosition = 0;
-    private int defaultViewHeight;
-
-    private boolean isClosing = false;
-    private boolean isScrollingUp = false;
-    private boolean isScrollingDown = false;
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
     String id,song_names,sources,image;
-
-    public media_player_visual() {
-        // Required empty public constructor
-    }
-
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -96,30 +90,19 @@ public class media_player_visual extends SwipeBackActivity {
 
     Messenger mService = null;
     boolean mIsBound=false;
-    final Messenger mMessenger = new Messenger(new IncomingHandler());
-
-    class IncomingHandler extends Handler {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case MusicService.MSG_SET_INT_VALUE:
-                    int cur=msg.getData().getInt("cur");
-                    int max=msg.getData().getInt("max");
-                    if(bar!=null){
-                    bar.setProgress(cur);
-                    bar.setMax(max);}
-                    setCurrentPostion(cur);
-                    break;
-                case MusicService.MSG_SET_STRING_VALUE:
-                    //  String str1 = msg.getData().getString("str1");
-                    //   MusicService.setText("Str Message: " + str1);
-                    break;
-                default:
-                    super.handleMessage(msg);
-            }
-        }
-    }
-
+    private SeekBar bar;
+    private int i = 0;
+    private Handler myHandler = new Handler();
+    private RelativeLayout baseLayout;
+    private int previousFingerPosition = 0;
+    private int baseLayoutPosition = 0;
+    private int defaultViewHeight;
+    private boolean isClosing = false;
+    private boolean isScrollingUp = false;
+    private boolean isScrollingDown = false;
+    // TODO: Rename and change types of parameters
+    private String mParam1;
+    private String mParam2;
     private ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             mService = new Messenger(service);
@@ -140,6 +123,87 @@ public class media_player_visual extends SwipeBackActivity {
           //  Toast.makeText(getApplicationContext(),"disconnected successfully to service",Toast.LENGTH_SHORT).show();
         }
     };
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Get extra data included in the Intent
+            song_names = intent.getStringExtra("name");
+            id = intent.getStringExtra("id");
+            sources = intent.getStringExtra("source");
+            image = intent.getStringExtra("image");
+
+
+            if (sources != null) {
+                song_name.setText(String.valueOf(song_names));
+                source.setText(new String_ytil().getHostName(sources));
+                Glide.with(context)
+                        .load(image).asBitmap().into(song_image);
+
+            }
+
+
+        }
+    };
+    private String TAG = "MediaPLayervisual";
+    Runnable UpdateSongTime = new Runnable() {
+
+
+        public void run() {
+
+
+            if (null != MusicService.mPlayer)
+
+
+                if (MusicService.mState == MusicService.State.Retrieving || MusicService.mState == MusicService.State.Preparing) {
+                    bar.setSecondaryProgress(0);
+                    pause.setVisibility(View.GONE);
+                    play.setVisibility(View.GONE);
+                    waiting.setVisibility(View.VISIBLE);
+                    Log.d(TAG, "inside retrieving or preparing ");
+
+
+                    //issekset=false;
+                } else if (MusicService.mState == MusicService.State.Playing) {
+
+                    //  int startTime = MusicService.mPlayer.getCurrentPosition();
+//
+                    pause.setVisibility(View.VISIBLE);
+                    play.setVisibility(View.GONE);
+                    waiting.setVisibility(View.GONE);
+                    // bar.setProgress(startTime);
+
+                    if (mIsBound)
+                        sendMessageToService(1);
+
+                    //    current_pos.setText(startTime + "1");
+
+
+                    Log.d(TAG, "inside playing ");
+
+
+                } else if (MusicService.mState == MusicService.State.Paused) {
+
+                    pause.setVisibility(View.GONE);
+                    play.setVisibility(View.VISIBLE);
+                    waiting.setVisibility(View.GONE);
+//                        Toast.makeText(context, "pause Music", Toast.LENGTH_SHORT).show();
+
+                } else if (MusicService.mState == MusicService.State.Stopped) {
+                    pause.setVisibility(View.GONE);
+                    play.setVisibility(View.VISIBLE);
+                    waiting.setVisibility(View.GONE);
+
+                }
+            if (!stop)
+                myHandler.postDelayed(this, 1000);
+        }
+    };
+
+    public media_player_visual() {
+        // Required empty public constructor
+    }
+
     private void CheckIfServiceIsRunning() {
         //If the service is running when the activity starts, we want to automatically bind to it.
         if (MusicService.isRunning() && !mIsBound) {
@@ -147,27 +211,17 @@ public class media_player_visual extends SwipeBackActivity {
             mIsBound=true;
         }
     }
-    private void sendMessageToService(int intvaluetosend) {
-        if (mIsBound) {
-            if (mService != null) {
-                try {
-                    Log.d(TAG,"Sending message");
-                    Message msg = Message.obtain(null, MusicService.MSG_SET_INT_VALUE, intvaluetosend, 0);
-                    msg.replyTo = mMessenger;
-                    mService.send(msg);
-                }
-                catch (RemoteException e) {
-                }
-            }
-        }
-    }
+
     void doBindService() {
         if(!mIsBound) {
-            bindService(new Intent(this, MusicService.class), mConnection, Context.BIND_AUTO_CREATE);
+            Intent i = new Intent(this, MusicService.class);
+            i.setPackage(getPackageName());
+            bindService(i, mConnection, Context.BIND_AUTO_CREATE);
             mIsBound = true;
         }
       //  Toast.makeText(getApplicationContext(),"Binding.....",Toast.LENGTH_SHORT).show();
     }
+
     void doUnbindService() {
         if (mIsBound) {
             // If we have received the service, and hence registered with it, then now is the time to unregister.
@@ -184,20 +238,70 @@ public class media_player_visual extends SwipeBackActivity {
             // Detach our existing connection.
             unbindService(mConnection);
             mIsBound = false;
+
       //      Toast.makeText(getApplicationContext(),"Un Binding.....",Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    public void send_action_url(String id, String song_name, String link, String pm) {
+        Message msg = Message.obtain(null, MusicService.MSG_SET_INT_VALUE, 0, 0);
+        Bundle i = new Bundle(0);
+        Log.d(TAG, "sending thes data to musix serivce" + id + "  " + song_name + "   " + link);
+
+        try {
+            i.putString("id", id);
+            i.putString("name", song_name);
+
+            i.putString("source", link);
+            i.putString("image", pm);
+            msg.setData(i);
+
+            Log.d(TAG, "id from mesanger: " + id);
+            Log.d(TAG, "file name from mesanger: " + song_name);
+            Log.d(TAG, "url from mesanger: " + link);
+            Log.d(TAG, "imagefrom mesanger: " + pm);
+            msg.replyTo = mMessenger;
+            mService.send(msg);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void sendMessageToService(int intvaluetosend) {
+        if (mIsBound) {
+            if (mService != null) {
+                try {
+                    Log.d(TAG, "Sending message");
+                    Message msg = Message.obtain(null, MusicService.MSG_SET_INT_VALUE, 1, 0);
+                    msg.replyTo = mMessenger;
+                    mService.send(msg);
+                } catch (RemoteException e) {
+                }
+            }
         }
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        doUnbindService();
+    private void sendMessageToService_play_pause(int intvaluetosend) {
+        if (mIsBound) {
+            if (mService != null) {
+                try {
+                    Log.d(TAG, "Sending message to play_pause the song");
+                    Message msg = Message.obtain(null, MusicService.MSG_SET_INT_VALUE, intvaluetosend, 0);
+                    msg.replyTo = mMessenger;
+                    mService.send(msg);
+                } catch (RemoteException e) {
+                }
+            }
+        }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        CheckIfServiceIsRunning();
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void setupWindowAnimations() {
+        Slide slide = new Slide();
+        slide.setDuration(1000);
+        getWindow().setExitTransition(slide);
     }
 
     // TODO: Rename and change types and number of parameters
@@ -207,8 +311,10 @@ public class media_player_visual extends SwipeBackActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.fragment_media_player_visual);
+        setupWindowAnimations();
         setDragEdge(SwipeBackLayout.DragEdge.TOP);
         getSupportActionBar().hide();
+
 
         //setDragEdge(SwipeBackLayout.DragEdge.LEFT);
         if (MusicService.mPlayer != null) {
@@ -223,8 +329,10 @@ public class media_player_visual extends SwipeBackActivity {
             image=getIntent().getStringExtra("image");
             sources=getIntent().getStringExtra("source");
             id=getIntent().getStringExtra("id");
-
             init();
+            CheckIfServiceIsRunning();
+            stop = false;
+            myHandler.post(UpdateSongTime);
 
 
             bar = (SeekBar) findViewById(R.id.progressBar1);
@@ -426,24 +534,8 @@ public class media_player_visual extends SwipeBackActivity {
                 public void onClick(View view) {
                     if (null != MusicService.mPlayer) {
 
-                        if (is_completed) {
-                            i1.setPackage(getPackageName());
-                            Uri uri = Uri.parse(sources);
-                            i1.setData(uri);
-
-                            startService(i1);
-                            is_completed = false;
-                        }
-
                         Log.d(TAG, "u clicked to pause the song");
-                        Intent serviceIntent = new Intent(MusicService.ACTION_PLAY);
-                        serviceIntent.setPackage(getPackageName());
-                        startService(serviceIntent);
-
-                        if (MusicService.mPlayer.isPlaying())
-                            MusicService.mState = MusicService.State.Playing;
-
-
+                        sendMessageToService_play_pause(2);
                     }
                 }
             });
@@ -452,24 +544,15 @@ public class media_player_visual extends SwipeBackActivity {
             pause.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
-
                     if (null != MusicService.mPlayer) {
-                        Log.d(TAG, "u clicked to play the song");
-                        Intent serviceIntent = new Intent(MusicService.ACTION_PAUSE);
-                        serviceIntent.setPackage(getPackageName());
-                        startService(serviceIntent);
+                        Log.d(TAG, "u clicked to pause the song");
+                        sendMessageToService_play_pause(2);
 
-                        if (!MusicService.mPlayer.isPlaying())
-                            MusicService.mState = MusicService.State.Paused;
                     }
-
-
-
                 }
             });
 
-            myHandler.postDelayed(UpdateSongTime, 100);
+
         }
 
 
@@ -497,29 +580,6 @@ public class media_player_visual extends SwipeBackActivity {
 
     }
 
-
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            // Get extra data included in the Intent
-            song_names = intent.getStringExtra("name");
-            id = intent.getStringExtra("id");
-            sources = intent.getStringExtra("source");
-            image = intent.getStringExtra("image");
-
-
-            if (sources != null) {
-                song_name.setText(String.valueOf(song_names));
-                source.setText(new String_ytil().getHostName(sources));
-                Glide.with(context)
-                        .load(image).asBitmap().into(song_image);
-
-            }
-
-
-        }
-    };
     private void init() {
 
         waiting = (ProgressBar) findViewById(R.id.waiting);
@@ -591,65 +651,6 @@ public class media_player_visual extends SwipeBackActivity {
         new Song_Image_loader(image, song_image).execute();
     }
 
-
-    private String TAG = "MediaPLayervisual";
-    Runnable UpdateSongTime = new Runnable() {
-
-
-        public void run() {
-
-
-            if (null != MusicService.mPlayer)
-
-
-                if (MusicService.mState == MusicService.State.Retrieving || MusicService.mState == MusicService.State.Preparing) {
-                    bar.setSecondaryProgress(0);
-                    pause.setVisibility(View.GONE);
-                    play.setVisibility(View.GONE);
-                    waiting.setVisibility(View.VISIBLE);
-                    Log.d(TAG,"inside retrieving or preparing ");
-
-
-
-                    //issekset=false;
-                } else if (MusicService.mState == MusicService.State.Playing) {
-
-                  //  int startTime = MusicService.mPlayer.getCurrentPosition();
-//
-                    pause.setVisibility(View.VISIBLE);
-                    play.setVisibility(View.GONE);
-                    waiting.setVisibility(View.GONE);
-                   // bar.setProgress(startTime);
-
-                    if(mIsBound)
-                    sendMessageToService(1);
-
-                    //    current_pos.setText(startTime + "1");
-
-
-                    Log.d(TAG,"inside playing ");
-
-
-
-                } else if (MusicService.mState == MusicService.State.Paused) {
-
-                        pause.setVisibility(View.GONE);
-                        play.setVisibility(View.VISIBLE);
-                        waiting.setVisibility(View.GONE);
-//                        Toast.makeText(context, "pause Music", Toast.LENGTH_SHORT).show();
-
-                } else if (MusicService.mState == MusicService.State.Stopped) {
-                    pause.setVisibility(View.GONE);
-                    play.setVisibility(View.VISIBLE);
-                    waiting.setVisibility(View.GONE);
-
-                }
-            if (!stop)
-                myHandler.postDelayed(this, 100);
-        }
-    };
-
-
     public void setCurrentPostion(int current) {
 //        int startTime = MusicService.mPlayer.getCurrentPosition();
 if(current_pos!=null) {
@@ -663,11 +664,13 @@ if(current_pos!=null) {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
         stop = true;
         //isRunning=false;
 
         mIsBound=false;
         doUnbindService();
+        finish();
 
     }
 
@@ -710,6 +713,29 @@ if(current_pos!=null) {
             return hostName;
         } else {
             return "unDetected";
+        }
+    }
+
+    class IncomingHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MusicService.MSG_SET_INT_VALUE:
+                    int cur = msg.getData().getInt("cur");
+                    int max = msg.getData().getInt("max");
+                    if (bar != null) {
+                        bar.setProgress(cur);
+                        bar.setMax(max);
+                    }
+                    setCurrentPostion(cur);
+                    break;
+                case MusicService.MSG_SET_STRING_VALUE:
+                    //  String str1 = msg.getData().getString("str1");
+                    //   MusicService.setText("Str Message: " + str1);
+                    break;
+                default:
+                    super.handleMessage(msg);
+            }
         }
     }
 

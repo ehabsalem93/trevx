@@ -1,14 +1,21 @@
 package trevx.Search;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.transition.Scene;
+import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -23,8 +30,8 @@ import trevx.Favourite.Favourite_Main_API;
 import trevx.MainActivity;
 import trevx.Musicplayer.MusicService;
 import trevx.Song_Manager.Song;
-import trevx.downloadManager.Song_Download_Manager;
 import trevx.com.trevx.R;
+import trevx.downloadManager.Song_Download_Manager;
 import trevx.util.Internet_connectivity;
 import trevx.util.String_ytil;
 
@@ -32,19 +39,41 @@ import trevx.util.String_ytil;
  * Created by ptk on 6/6/16.
  */
 public class Search_FRagment_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private static final String TAG = "search_custom_apater_1";
+    private static final String TAG = "search_custom_apater";
     public static Context context;
+    private final int VIEW_TYPE_ITEM = 0;
+    private final int VIEW_TYPE_LOADING = 1;
+    public int visibleThreshold = 10;
+    public int lastVisibleItem, totalItemCount;
     LinkedList<Song> song_list;
     MainActivity activity;
-    private final int VIEW_ITEM = 1;
-    private final int VIEW_PROG = 0;
-
-
+    ViewGroup go;
+    private OnLoadMoreListnert mOnLoadMoreListener;
+    private boolean isLoading = false;
 
     public Search_FRagment_Adapter(LinkedList<Song> song_list, Context context) {
         this.song_list = song_list;
         Search_FRagment_Adapter.context = context;
         activity = (MainActivity) context;
+
+
+        final LinearLayoutManager linearLayoutManager = (LinearLayoutManager) Search_Fragment.rv.getLayoutManager();
+        Search_Fragment.rv.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                totalItemCount = linearLayoutManager.getItemCount();
+                lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
+
+                if (!isLoading && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
+                    if (mOnLoadMoreListener != null) {
+                        mOnLoadMoreListener.onLoadMore();
+                    }
+                    //   isLoading = true;
+                }
+            }
+        });
     }
 
 
@@ -53,7 +82,8 @@ public class Search_FRagment_Adapter extends RecyclerView.Adapter<RecyclerView.V
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         RecyclerView.ViewHolder vh;
         PersonViewHolder pvh;
-        if(viewType==VIEW_ITEM) {
+        go = parent;
+        if (viewType == VIEW_TYPE_ITEM) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.search_result, parent, false);
              pvh = new PersonViewHolder(v);
             return pvh;
@@ -91,86 +121,107 @@ public class Search_FRagment_Adapter extends RecyclerView.Adapter<RecyclerView.V
     }
     @Override
     public int getItemCount() {
-        return song_list.size()+1;
+        if (song_list.size() == Search_Fragment.Song_count)
+            return song_list.size();
+        return song_list == null ? 0 : song_list.size() + 1;
     }
 
+    public void setLoaded(boolean loadd) {
+        isLoading = loadd;
+    }
 
     @Override
     public int getItemViewType(int position) {
-        return position <song_list.size()? VIEW_ITEM: VIEW_PROG;
+
+        return position < song_list.size() ? VIEW_TYPE_ITEM : VIEW_TYPE_LOADING;
     }
 
-
+    public void setOnLoadMoreListener(OnLoadMoreListnert mOnLoadMoreListener) {
+        this.mOnLoadMoreListener = mOnLoadMoreListener;
+    }
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
 
 if(holder instanceof PersonViewHolder) {
-    final PersonViewHolder personViewHolder=(PersonViewHolder)holder;
-    personViewHolder.personName.setText(new String_ytil().edit_songName(song_list.get(position).getTitle()));
-    personViewHolder.personAge.setText(new String_ytil().edit_songName(new String_ytil().getHostName(song_list.get(position).getLink())));
-    personViewHolder.setImage(song_list.get(position).getImage());
+    if (holder instanceof PersonViewHolder) {
+        final PersonViewHolder personViewHolder = (PersonViewHolder) holder;
 
-    if (Favourite_Main_API.check_exist(song_list.get(position).getId())) {
-        personViewHolder.personfavouriteunfilled.setVisibility(View.GONE);
-        personViewHolder.personfavouritefilled.setVisibility(View.VISIBLE);
-        Toast.makeText(context, "favo in " + position + "   " + song_list.get(position).getId(), Toast.LENGTH_LONG).show();
+        Log.d(TAG, "possssss" + position + "song list possss    " + song_list.size() + "trevx list sie    ");
+        personViewHolder.personName.setText(new String_ytil().edit_songName(song_list.get(position).getTitle()));
+        personViewHolder.personAge.setText(new String_ytil().edit_songName(new String_ytil().getHostName(song_list.get(position).getLink())));
+        personViewHolder.setImage(song_list.get(position).getImage());
 
-    } else {
-        personViewHolder.personfavouriteunfilled.setVisibility(View.VISIBLE);
-        personViewHolder.personfavouritefilled.setVisibility(View.GONE);
-    }
+        if (Favourite_Main_API.check_exist(song_list.get(position).getId())) {
+            personViewHolder.personfavouriteunfilled.setVisibility(View.GONE);
+            personViewHolder.personfavouritefilled.setVisibility(View.VISIBLE);
+//            Toast.makeText(context, "favo in " + position + "   " + song_list.get(position).getId(), Toast.LENGTH_LONG).show();
 
-
-    personViewHolder.Container.setOnClickListener(new View.OnClickListener() {
-
-
-        @Override
-        public void onClick(View view) {
-            MusicService.mState = MusicService.State.Stopped;
-            play(song_list.get(position).getId(), song_list.get(position).getTitle(), song_list.get(position).getLink(), song_list.get(position).getImage());
-
-
-        }
-    });
-    personViewHolder.persondownload.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-
-            if (!Internet_connectivity.check_connection(context) && !Internet_connectivity.check_connection(context)) {
-                return;
-            }
-            download(song_list.get(position).getTitle(), song_list.get(position).getLink());
-
-
-        }
-    });
-
-    personViewHolder.personfavouriteunfilled.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            {
-                personViewHolder.personfavouriteunfilled.setVisibility(View.GONE);
-                personViewHolder.personfavouritefilled.setVisibility(View.VISIBLE);
-                sendMessageToFavourite(song_list.get(position).getTitle(), song_list.get(position).getLink(), song_list.get(position).getImage(), song_list.get(position).getId());
-            }
-            //  else
-            {
-                //  activity.print_Message("Song already exist in your favourite list");
-                //    Snackbar.make(MainActivity.layout,"Song already exist in your favourite list",Snackbar.LENGTH_SHORT ).show();
-            }
-
-        }
-    });
-
-    personViewHolder.personfavouritefilled.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
+        } else {
             personViewHolder.personfavouriteunfilled.setVisibility(View.VISIBLE);
             personViewHolder.personfavouritefilled.setVisibility(View.GONE);
-            sendMessageToremovefromFavourite(song_list.get(position).getId());
         }
-    });
 
+
+        personViewHolder.Container.setOnClickListener(new View.OnClickListener() {
+
+
+            @Override
+            public void onClick(View view) {
+                MusicService.mState = MusicService.State.Stopped;
+                play(song_list.get(position).getId(), song_list.get(position).getTitle(), song_list.get(position).getLink(), song_list.get(position).getImage());
+
+
+            }
+        });
+        personViewHolder.persondownload.setOnClickListener(new View.OnClickListener() {
+            @TargetApi(Build.VERSION_CODES.KITKAT)
+            @Override
+            public void onClick(View view) {
+
+                if (!Internet_connectivity.check_connection(context) && !Internet_connectivity.check_connection(context)) {
+                    return;
+                }
+                //download(song_list.get(position).getTitle(), song_list.get(position).getLink());
+
+                final Scene scene = Scene.getSceneForLayout((ViewGroup) view, R.layout.fragment_search__fragments, context);
+                TransitionManager.go(scene);
+
+
+            }
+        });
+
+        personViewHolder.personfavouriteunfilled.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                {
+                    Animation shake = AnimationUtils.loadAnimation(context, R.anim.shake);
+                    view.startAnimation(shake);
+                    personViewHolder.personfavouriteunfilled.setVisibility(View.GONE);
+                    personViewHolder.personfavouritefilled.setVisibility(View.VISIBLE);
+                    sendMessageToFavourite(song_list.get(position).getTitle(), song_list.get(position).getLink(), song_list.get(position).getImage(), song_list.get(position).getId());
+                }
+                //  else
+                {
+                    //  activity.print_Message("Song already exist in your favourite list");
+                    //    Snackbar.make(MainActivity.layout,"Song already exist in your favourite list",Snackbar.LENGTH_SHORT ).show();
+                }
+
+            }
+        });
+
+        personViewHolder.personfavouritefilled.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Animation shake = AnimationUtils.loadAnimation(context, R.anim.shake);
+                view.startAnimation(shake);
+                personViewHolder.personfavouriteunfilled.setVisibility(View.VISIBLE);
+                personViewHolder.personfavouritefilled.setVisibility(View.GONE);
+                sendMessageToremovefromFavourite(song_list.get(position).getId());
+
+            }
+        });
+
+    }
 }
         else {
     ((ProgressViewHolder)holder).progressBar.setIndeterminate(true);
@@ -181,7 +232,7 @@ if(holder instanceof PersonViewHolder) {
         try {
             String source = fileurl;
             //  String title=new String_ytil().edit_songName((fileName));
-            Toast.makeText(context, "Source is " + fileurl, Toast.LENGTH_LONG).show();
+            //     Toast.makeText(context, "Source is " + fileurl, Toast.LENGTH_LONG).show();
             Log.d(TAG, "id: " + id);
             Log.d(TAG, "file name: " + fileName);
             Log.d(TAG, "url: " + fileurl);
@@ -205,6 +256,10 @@ if(holder instanceof PersonViewHolder) {
     }
 
 
+    public interface OnLoadMoreListener {
+        void onLoadMore();
+    }
+
     public static class ProgressViewHolder extends RecyclerView.ViewHolder {
         public ProgressBar progressBar;
         public ProgressViewHolder(View v) {
@@ -212,7 +267,6 @@ if(holder instanceof PersonViewHolder) {
             progressBar = (ProgressBar)v.findViewById(R.id.progressBar);
         }
     }
-
 
     public static class PersonViewHolder extends RecyclerView.ViewHolder {
         CardView cv;
@@ -247,7 +301,7 @@ if(holder instanceof PersonViewHolder) {
             try {
 
                 Glide.with(context)
-                        .load(link).into(personPhoto);
+                        .load(link).skipMemoryCache(false).into(personPhoto);
 
                 // Picasso.with(context).load(link).into(personPhoto);
                 // new Song_Image_loader(link,personPhoto);
@@ -257,7 +311,6 @@ if(holder instanceof PersonViewHolder) {
             }
         }
     }
-
 
 
 }

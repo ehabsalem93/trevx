@@ -18,6 +18,7 @@ public class get_song_trevx_fill extends AsyncTask<String, Void, String> {
     protected void onPreExecute() {
 
         MainActivity.progressBar.setVisibility(View.VISIBLE);
+
     }
 
 
@@ -42,11 +43,7 @@ public class get_song_trevx_fill extends AsyncTask<String, Void, String> {
     protected void onPostExecute(String result) {
 
 //            if (null != trevx_api.song_list && trevx_api.song_list.size() > 0 && null != searchFragment)
-        if(MainActivity.searchFragment !=null)
-        {
-           MainActivity.searchFragment.setadapter1();
 
-        }
         //else
         {
 

@@ -186,6 +186,9 @@ public class SearchViewLayout extends FrameLayout {
                     mSearchBoxListener.onTextChanged(s, start, before, count);
             }
 
+            public void setEditTest(String x) {
+                mSearchEditText.setText(x);
+            }
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 if (mSearchBoxListener != null)
@@ -312,7 +315,7 @@ public class SearchViewLayout extends FrameLayout {
     }
 
     /***
-     * Overrides both, {@link #setCollapsedHint(String)} and {@link #setExpandedHint(String)},
+     * Overrides both,  and {@link #setExpandedHint(String)},
      * and sets hint for both the views.
      * <p>
      * Use this if you don't want to show different hints in both the states
@@ -337,6 +340,7 @@ public class SearchViewLayout extends FrameLayout {
     public void setExpandedText(String searchViewText) {
         if (searchViewText != null) {
             mSearchEditText.setText(searchViewText);
+            mSearchEditText.setSelection(searchViewText.length());
         }
     }
 

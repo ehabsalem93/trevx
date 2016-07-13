@@ -5,6 +5,7 @@ import android.util.Log;
 
 import trevx.ListViewAdapter;
 import trevx.SearchStaticListSupportFragment;
+import trevx.home;
 
 /**
  * Created by ptk on 7/1/16.
@@ -43,6 +44,7 @@ public class getSuggestion extends AsyncTask<String, Void, String> {
         SearchStaticListSupportFragment.listView.setAdapter(SearchStaticListSupportFragment.adapter);
         Log.d(TAG, "Result" + Suggesion.Suggestionword.toString());
         SearchStaticListSupportFragment.adapter.notifyDataSetChanged();
+        home.setApater();
 //            if (null != trevx_api.song_list && trevx_api.song_list.size() > 0 && null != searchFragment)
         // if (MainActivity.searchFragment != null) {
         //    MainActivity.searchFragment.setadapter1();

@@ -23,8 +23,9 @@ import trevx.Favourite.Favourite_Main_API;
 import trevx.MainActivity;
 import trevx.Musicplayer.MusicService;
 import trevx.Song_Manager.Song;
-import trevx.downloadManager.Song_Download_Manager;
+import trevx.Song_Manager.trevx_api.trevx_api;
 import trevx.com.trevx.R;
+import trevx.downloadManager.Song_Download_Manager;
 import trevx.util.Internet_connectivity;
 import trevx.util.String_ytil;
 
@@ -37,11 +38,10 @@ public class Search_FRagment_Adapter1 extends com.sa90.infiniterecyclerview.Infi
     private static final String TAG = "search_custom_apater_1";
     public static Context context;
    public static LinkedList<Song> song_list;
-    MainActivity activity;
     private final int VIEW_ITEM = 1;
     private final int VIEW_PROG = 0;
-
-
+    MainActivity activity;
+    PersonViewHolder pvh;
 
     public Search_FRagment_Adapter1(LinkedList<Song> song_list, Context context) {
         this.song_list = song_list;
@@ -73,8 +73,6 @@ public class Search_FRagment_Adapter1 extends com.sa90.infiniterecyclerview.Infi
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
-    PersonViewHolder pvh;
-
     @Override
     public void setShouldLoadMore(boolean shouldLoadMore) {
         super.setShouldLoadMore(shouldLoadMore);
@@ -91,6 +89,12 @@ public class Search_FRagment_Adapter1 extends com.sa90.infiniterecyclerview.Infi
 
     @Override
     public int getCount() {
+
+        if (Search_Fragment.Song_count > trevx_api.song_list.size())
+            setShouldLoadMore(true);
+        else
+            setShouldLoadMore(false);
+
          return song_list.size();
     }
 
@@ -262,7 +266,7 @@ if(holder instanceof PersonViewHolder && position <song_list.size()) {
             try {
 
                 Glide.with(context)
-                        .load(link).into(personPhoto);
+                        .load(link).skipMemoryCache(false).into(personPhoto);
 
                 // Picasso.with(context).load(link).into(personPhoto);
                 // new Song_Image_loader(link,personPhoto);

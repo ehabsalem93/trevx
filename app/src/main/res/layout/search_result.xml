@@ -9,7 +9,7 @@
         android:layout_marginBottom="5dp"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
-        android:padding="4dp"
+        android:padding="1dp"
         >
 
         <RelativeLayout
@@ -80,8 +80,8 @@
 
             <ImageButton
                 android:id="@+id/heart_filled"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
                 android:layout_alignTop="@+id/download"
                 android:layout_gravity="center"
                 android:layout_marginBottom="5dp"

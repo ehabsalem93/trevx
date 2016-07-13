@@ -18,31 +18,27 @@
         android:text="there is no content to be viewed" />
 
 <android.support.v7.widget.AppCompatImageView
+    android:id="@+id/noresultimage"
     android:layout_width="36dp"
     android:layout_height="36dp"
-    android:layout_marginBottom="10dp"
     android:layout_above="@+id/noresult"
     android:layout_centerHorizontal="true"
+    android:layout_marginBottom="10dp"
     android:background="@drawable/ic_search" />
-<android.support.v4.widget.SwipeRefreshLayout
-    android:id="@+id/swipelayuout"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="5dp"
-    android:visibility="visible">
+
+
     <!-- TODO: Update blank fragment layout -->
 
-    <com.sa90.infiniterecyclerview.InfiniteRecyclerView
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/rv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
 
-        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true" />
+        android:layout_alignParentTop="true" />
 
-</android.support.v4.widget.SwipeRefreshLayout>
 
 
 

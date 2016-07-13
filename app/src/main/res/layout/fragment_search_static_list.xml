@@ -1,7 +1,15 @@
-<ListView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/White">
+
+    <ListView
     android:id="@+id/search_static_list"
     android:layout_width="match_parent"
-    android:layout_height="270dp"
+        android:layout_height="match_parent"
     android:focusable="true"
+        android:visibility="visible"
 
-    android:visibility="visible" />
+        />
+
+</RelativeLayout>

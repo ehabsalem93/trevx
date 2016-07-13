@@ -55,7 +55,7 @@
                 android:layout_alignStart="@+id/song_name"
                 android:layout_below="@+id/song_name"
                 android:alpha="0.4"
-                android:background="@color/black_p50"
+                android:background="@color/black_overlay"
                 android:focusable="false"
                 android:gravity="center"
                 android:text="source"

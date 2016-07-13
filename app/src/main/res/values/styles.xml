@@ -24,7 +24,13 @@
         <item name="colorAccent">@color/colorAccent</item>
 
 
+    </style>
 
+    <style name="Theme.AppCompat.Light.DarkActionBar" parent="Base.Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+
+        <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>
+        <item name="colorAccent">@color/colorAccent</item>
     </style>
 
     <style name="MyCustomTabLayout" parent="Widget.Design.TabLayout">

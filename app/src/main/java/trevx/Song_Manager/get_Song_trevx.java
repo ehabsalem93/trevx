@@ -4,8 +4,8 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
 
-import trevx.Song_Manager.trevx_api.trevx_api;
 import trevx.MainActivity;
+import trevx.Song_Manager.trevx_api.trevx_api;
 
 /**
  * Created by ptk on 6/19/16.
@@ -43,7 +43,7 @@ public class get_Song_trevx extends AsyncTask<String, Void, String> {
 //            if (null != trevx_api.song_list && trevx_api.song_list.size() > 0 && null != searchFragment)
        if(MainActivity.searchFragment !=null)
         {
-            MainActivity.searchFragment.setadapter1();
+            MainActivity.searchFragment.setadapter2(true);
 
         }
         //else
