@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <color name="searchbox_text_color">#000000</color>
+    <!-- Background color of the search box -->
+    <color name="searchbox_background_color">#ffffff</color>
+    <!-- Text color of the search box hint text  -->
+    <color name="searchbox_hint_text_color">#a4a4a4</color>
+    <color name="searchbox_icon_tint">#a4a4a4</color>
+    <color name="search_shortcut_background_color">#b6b6b6</color>
+    <color name="search_shortcut_icon_color">#f8f8f8</color>
+
+    <color name="default_color_expanded">#F0F0F0</color>
+
+
+    <color name="colorPrimary">#e04f3e</color>
+    <color name="actionbar">#dd4433</color>
+    <color name="listitem">#ededed</color>
+    <color name="player">#bbbbbb</color>
+    <color name="progress_fron">#dd4433</color>
+    <color name="progress_back">#fcb0b0</color>
+    <color name="colorsecondary">#c24a4f</color>
+    <color name="White">#FFFFFF</color>
+    <color name="colorprogress">#f2b8b1</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#fcb0b0</color>
+    <color name="sa_green">#1E9618</color>
+    <color name="sa_accent">#4EE147</color>
+    <color name="sa_accent_transparent">#D8F3D8</color>
+    <color name="sa_green_dark">#156912</color>
+    <color name="error_text_colour">#806060FF</color>
+    <color name="tab_text_act">#ffffff</color>
+    <color name="tab_text">#c53120</color>
+    <color name="textblack">#2b2b2b</color>
+    <color name="textwhite">#fff</color>
+    <color name="subtext">#bebebe</color>
+    <color name="sub">#7d7d7d</color>
+    <color name="red">#e95f5d</color>
+
+    <color name="black_overlay">#66000000</color>
+
+
+</resources>
