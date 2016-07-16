@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,7 +21,6 @@ import com.nikhilpanju.recyclerviewenhanced.RecyclerTouchListener;
 
 import it.gmariotti.recyclerview.itemanimator.SlideInOutRightItemAnimator;
 import trevx.Musicplayer.MusicService;
-import trevx.Song_Manager.get_Song_trevx;
 import trevx.Song_Manager.trevx_api.get_song_trevx_fill;
 import trevx.Song_Manager.trevx_api.trevx_api;
 import trevx.com.trevx.R;
@@ -210,8 +210,13 @@ public class Search_Fragment extends Fragment {
 
             } else {
 
-                new get_Song_trevx();
-
+                try {
+                    new get_song_trevx_fill().execute();
+                    //new getSong().get_more_song();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.d(TAG, "Error in filling more song: " + e.toString());
+                }
 
                 if (trevx_api.song_list.size() > 0) {
 
@@ -227,7 +232,14 @@ public class Search_Fragment extends Fragment {
                         public void onLoadMore() {
                             if (adapter.song_list.size() < Song_count) {
                                 int index = trevx_api.song_list.size();
-                                new get_song_trevx_fill().execute();
+                                try {
+                                    new get_song_trevx_fill().execute();
+                                    // new getSong().get_more_song();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    Log.d(TAG, "Error in filling more song: " + e.toString());
+                                }
+
                                 for (int x = index; x < (trevx_api.song_list.size()); x++) {
                                     adapter.song_list.add(trevx_api.song_list.get(x));
 

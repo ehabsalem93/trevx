@@ -49,6 +49,8 @@ import com.bumptech.glide.Glide;
 
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -326,11 +328,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onNewIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
-            doSearch(query);
+            try {
+                doSearch(query);
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+                Log.d(TAG, "Error Unsupporting encoding :" + e.toString());
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+                Log.d(TAG, "Error MalformedURLException  :" + e.toString());
+            }
         }
     }
 
-    private void doSearch(final String queryStr) {
+    private void doSearch(final String queryStr) throws UnsupportedEncodingException, MalformedURLException {
         // get a Cursor, prepare the ListAdapter
         // and set it
         //Toast.makeText(getApplicationContext(),"your voice are"+queryStr,Toast.LENGTH_LONG).show();
@@ -347,6 +357,8 @@ public class MainActivity extends AppCompatActivity {
             return;
         } else {
             new get_Song_trevx().execute();
+            //   new getSong().get_song(queryStr);
+
             //   searchViewCompat.onActionViewCollapsed();
         }
     }
@@ -419,7 +431,15 @@ public class MainActivity extends AppCompatActivity {
             public void onFinished(String searchKeyword) {
                 searchViewLayout.collapse();
               //  Snackbar.make(searchViewLayout, "Start Search for - " + searchKeyword, Snackbar.LENGTH_LONG).show();
-                doSearch(searchKeyword);
+                try {
+                    doSearch(searchKeyword);
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                    Log.d(TAG, "Error Unsuppoerted Encoding :" + e.toString());
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                    Log.d(TAG, "Error MalformedURLException Encoding :" + e.toString());
+                }
             }
         });
         searchViewLayout.setOnToggleAnimationListener(new SearchViewLayout.OnToggleAnimationListener() {
@@ -655,7 +675,7 @@ public void send_email(String text)
         tabLayout.getTabAt(1).setIcon(R.drawable.ic_view_list_white_24dp);
         tabLayout.getTabAt(1).setText("");
 
-        mViewPager.setPageTransformer(false, new DepthPageTransformer());
+        mViewPager.setPageTransformer(true, new DepthPageTransformer());
         tabLayout.getTabAt(0).setIcon(R.drawable.ic_whatshot_white_24dp);
         tabLayout.getTabAt(0).setText("");
         TelephonyManager tm = (TelephonyManager) this.getSystemService(TELEPHONY_SERVICE);
@@ -795,7 +815,14 @@ public void send_email(String text)
                 Search_Fragment.adapter.notifyDataSetChanged();
                 return;
             }
-            doSearch(queryy);
+            try {
+                doSearch(queryy);
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+                Log.d(TAG, "Error in OnSTart: " + e.toString());
+            }
             mViewPager.setCurrentItem(1);
 
         }

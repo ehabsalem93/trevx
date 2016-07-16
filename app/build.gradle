@@ -56,4 +56,5 @@ dependencies {
     compile 'com.ogaclejapan.smarttablayout:utils-v13:1.6.1@aar'
 
     compile project(path: ':library')
+    compile 'junit:junit:4.12'
 }

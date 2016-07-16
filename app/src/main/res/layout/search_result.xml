@@ -59,23 +59,27 @@
                 android:id="@+id/download"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
+                android:layout_alignBottom="@+id/person_age"
                 android:layout_alignParentEnd="true"
-                android:layout_alignParentTop="true"
                 android:layout_gravity="center"
                 android:layout_marginRight="10dp"
-                android:layout_marginTop="2dp"
                 android:background="@drawable/download"
-                />
+                android:stateListAnimator="@anim/right_to_left"
+                android:visibility="visible" />
 
             <ImageButton
                 android:id="@+id/heart_unfilled"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:layout_alignTop="@+id/download"
+
                 android:layout_gravity="center"
+                android:layout_marginBottom="5dp"
                 android:layout_marginRight="10dp"
                 android:layout_toLeftOf="@+id/download"
                 android:background="@drawable/favorite_unfilled"
+
+                android:stateListAnimator="@anim/slidup"
                 android:visibility="visible" />
 
             <ImageButton
@@ -88,7 +92,8 @@
                 android:layout_marginRight="10dp"
                 android:layout_toLeftOf="@+id/download"
                 android:background="@drawable/favorite_filled"
-                android:visibility="gone" />
+                android:stateListAnimator="@anim/slidup"
+                android:visibility="visible" />
 
         </RelativeLayout>
 

@@ -8,14 +8,12 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.transition.Scene;
-import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
+import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -82,7 +80,7 @@ public class Search_FRagment_Adapter extends RecyclerView.Adapter<RecyclerView.V
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         RecyclerView.ViewHolder vh;
         PersonViewHolder pvh;
-        go = parent;
+
         if (viewType == VIEW_TYPE_ITEM) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.search_result, parent, false);
              pvh = new PersonViewHolder(v);
@@ -173,6 +171,7 @@ if(holder instanceof PersonViewHolder) {
 
             }
         });
+
         personViewHolder.persondownload.setOnClickListener(new View.OnClickListener() {
             @TargetApi(Build.VERSION_CODES.KITKAT)
             @Override
@@ -181,11 +180,13 @@ if(holder instanceof PersonViewHolder) {
                 if (!Internet_connectivity.check_connection(context) && !Internet_connectivity.check_connection(context)) {
                     return;
                 }
-                //download(song_list.get(position).getTitle(), song_list.get(position).getLink());
+                download(song_list.get(position).getTitle(), song_list.get(position).getLink());
 
-                final Scene scene = Scene.getSceneForLayout((ViewGroup) view, R.layout.fragment_search__fragments, context);
-                TransitionManager.go(scene);
-
+                Animation animation1 = new TranslateAnimation(view.getScaleX(), view.getScaleX(), view.getScaleY(), view.getScaleY() + 110);
+                animation1.setDuration(1000);
+                personViewHolder.persondownload.setAnimation(animation1);
+                personViewHolder.persondownload.startAnimation(animation1);
+              
 
             }
         });
@@ -194,11 +195,23 @@ if(holder instanceof PersonViewHolder) {
             @Override
             public void onClick(View view) {
                 {
-                    Animation shake = AnimationUtils.loadAnimation(context, R.anim.shake);
-                    view.startAnimation(shake);
-                    personViewHolder.personfavouriteunfilled.setVisibility(View.GONE);
                     personViewHolder.personfavouritefilled.setVisibility(View.VISIBLE);
+
+                    // view.startAnimation(animation);
+
+                    Animation animation1 = new TranslateAnimation(view.getScaleX(), personViewHolder.personfavouriteunfilled.getScaleX() + 500, personViewHolder.personfavouriteunfilled.getScaleY(), view.getY() - 500);
+                    animation1.setDuration(1000);
+
+                    personViewHolder.personfavouriteunfilled.setAnimation(animation1);
+                    personViewHolder.personfavouriteunfilled.startAnimation(animation1);
+
+
+
                     sendMessageToFavourite(song_list.get(position).getTitle(), song_list.get(position).getLink(), song_list.get(position).getImage(), song_list.get(position).getId());
+
+
+                    personViewHolder.personfavouriteunfilled.setVisibility(View.GONE);
+
                 }
                 //  else
                 {
@@ -212,11 +225,23 @@ if(holder instanceof PersonViewHolder) {
         personViewHolder.personfavouritefilled.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Animation shake = AnimationUtils.loadAnimation(context, R.anim.shake);
-                view.startAnimation(shake);
+
+
                 personViewHolder.personfavouriteunfilled.setVisibility(View.VISIBLE);
-                personViewHolder.personfavouritefilled.setVisibility(View.GONE);
+
+
+                Animation animation1 = new TranslateAnimation(view.getScaleX(), personViewHolder.personfavouriteunfilled.getScaleX() + 500, personViewHolder.personfavouriteunfilled.getScaleY(), view.getY() - 500);
+                animation1.setDuration(1000);
+                personViewHolder.personfavouritefilled.setAnimation(animation1);
+                personViewHolder.personfavouritefilled.startAnimation(animation1);
+
+
+
+
                 sendMessageToremovefromFavourite(song_list.get(position).getId());
+
+
+                personViewHolder.personfavouritefilled.setVisibility(View.GONE);
 
             }
         });
