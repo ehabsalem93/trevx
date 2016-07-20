@@ -381,6 +381,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             CheckIfServiceIsRunning();
+            ;
             Suggesion.Suggestionword = new ArrayList<String>();
 
             //        ***********initiallizing the main component of the application**********
@@ -397,6 +398,7 @@ public class MainActivity extends AppCompatActivity {
 
 
             it();
+
             myHandler = new Handler();
             myHandler.postDelayed(UpdateSongTime, 100);
 

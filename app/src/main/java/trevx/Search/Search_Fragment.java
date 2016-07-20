@@ -19,9 +19,15 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.nikhilpanju.recyclerviewenhanced.RecyclerTouchListener;
 
+import java.util.LinkedList;
+
+import eu.fiskur.chipcloud.ChipCloud;
 import it.gmariotti.recyclerview.itemanimator.SlideInOutRightItemAnimator;
+import me.originqiu.library.EditTag;
 import trevx.Musicplayer.MusicService;
+import trevx.Song_Manager.trevx_api.get_search_tag;
 import trevx.Song_Manager.trevx_api.get_song_trevx_fill;
+import trevx.Song_Manager.trevx_api.search_tag;
 import trevx.Song_Manager.trevx_api.trevx_api;
 import trevx.com.trevx.R;
 import trevx.util.Internet_connectivity;
@@ -56,6 +62,7 @@ public class Search_Fragment extends Fragment {
     private String mParam2;
     private OnFragmentInteractionListener mListener;
     private RecyclerTouchListener onTouchListener;
+    private EditTag editTagView;
 
     public Search_Fragment() {
         // Required empty public constructor
@@ -97,26 +104,71 @@ public class Search_Fragment extends Fragment {
         }
 
 
-        setRetainInstance(true);
 
+        setRetainInstance(true);
 
 
     }
 
 
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_search__fragments, container, false);
         context = view.getContext();
 
-
-
+        search_tag.searched_tag_list = new LinkedList<>();
+        new get_search_tag().execute();
         pull_request();
+        ChipCloud chipCloud = (ChipCloud) view.findViewById(R.id.chip_cloud);
 
+        String[] eh = new String[15];
+        Log.d(TAG, "siiiz " + search_tag.searched_tag_list.size());
+        for (int i = 0; i < 15; i++) {
+            //  tagStrings.add("test" + i);
+            Log.d(TAG, "search frgamenttag " + search_tag.searched_tag_list.get(i));
+            eh[i] = search_tag.searched_tag_list.get(i);
+            chipCloud.addChip(search_tag.searched_tag_list.get(i));
+        }
+
+
+        editTagView = (EditTag) view.findViewById(R.id.edit_tag_view);
+        // statusSwitchView = (SwitchCompat) getActivity().findViewById(R.id.status_switch);
+
+
+//         editTagView.setTagList(search_tag.searched_tag_list);
+
+        // statusSwitchView.setOnCheckedChangeListener(this);
+        editTagView.setEditable(false);
+
+//      editTagView.setTagList(search_tag.searched_tag_list);
+
+
+
+
+       /*     chipCloud.addChips(eh);
+        new ChipCloud.Configure()
+                .chipCloud(chipCloud)
+
+                .selectTransitionMS(500)
+                .deselectTransitionMS(250)
+                .labels(eh)
+                .mode(ChipCloud.Mode.MULTI)
+                .chipListener(new ChipListener() {
+                    @Override
+                    public void chipSelected(int index) {
+                        //...
+                    }
+                    @Override
+                    public void chipDeselected(int index) {
+                        //...
+                    }
+                })
+                .build();
+*/
             return view;
 
     }
@@ -165,8 +217,7 @@ public class Search_Fragment extends Fragment {
         if (new_swearch) {
             Glide.get(getActivity()).clearMemory();
         }
-        noresult=(TextView) view.findViewById(R.id.noresult);
-        note = (AppCompatImageView) view.findViewById(R.id.noresultimage);
+
 
         if (!Internet_connectivity.check_connection(context)) {
             return;

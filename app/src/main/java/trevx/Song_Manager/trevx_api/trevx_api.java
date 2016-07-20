@@ -98,6 +98,32 @@ public class trevx_api implements Serializable{
         Reader_Json(response);
     }
 
+
+    public static void get_tag_api() throws IOException {
+        //
+        URL url = new URL("http://trevx.com/discover-api.php?type=search&lan=en&country=jo&order=random&limit=20");
+
+        Log.d(TAG, "Loading tags.......");
+
+        // URL url = new URL("http://trevx.com/v1/"+query+"/1/40/?format=json");
+        URLConnection connection = url.openConnection();
+        connection.setConnectTimeout(10000);
+        // connection.setRequestProperty("Authorization", "Basic " + );
+        String inputLine;
+        StringBuilder response = new StringBuilder();
+        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+
+        }
+        Log.d(TAG, "response is" + response.toString());
+
+        Reader_tag_json(response);
+    }
+
+
+
+
     public static void Reader_Json(StringBuilder JSON_Builder) {
        // ArrayList<Song> song_list=new ArrayList<>();
         try {
@@ -114,6 +140,38 @@ public class trevx_api implements Serializable{
               ;if(i<json.length()-7) {
                     results = json.getJSONObject(i);
                     song_list.add(new Song(results.get("title").toString(), results.get("id").toString(), results.get("image").toString(), results.getString("link").toString()));
+                } else {
+
+
+                }
+
+            }
+
+            Log.d(TAG, "song list after loading are" + song_list.size() + "   " + song_list.toString());
+
+        } catch (JSONException ex) {
+            Logger.getLogger(trevx_api.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    public static void Reader_tag_json(StringBuilder JSON_Builder) {
+        // ArrayList<Song> song_list=new ArrayList<>();
+        try {
+
+            search_tag.searched_tag_list = new LinkedList<>();
+            JSONArray json = new JSONArray(JSON_Builder.toString());
+
+            JSONObject results;
+
+            for (int i = 0; i < (json.length()); i++) {
+
+                ;
+                if (i < json.length()) {
+//                    results = json.getJSONObject(i);
+                    search_tag.searched_tag_list.add(json.get(i).toString());
+                    Log.d(TAG, "trevxx  " + json.get(i).toString());
+                    //   song_list.add(new Song(results.get("title").toString(), results.get("id").toString(), results.get("image").toString(), results.getString("link").toString()));
                 }else{
 
 

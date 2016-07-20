@@ -29,7 +29,8 @@ dependencies {
     // compile 'com.hannesdorfmann.smoothprogressbar:library:1.0.0'
     compile project(path: ':library')
     // compile 'com.github.lzyzsd:circleprogress:1.1.0@aar'
-
+    compile 'com.github.qiugang:EditTag:v1.1'
+    compile 'com.github.fiskurgit:ChipCloud:2.1.0'
 
     compile 'com.google.android.gms:play-services-ads:9.2.1'
     compile 'com.android.support:design:24.1.0'
