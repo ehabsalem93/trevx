@@ -103,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
     AppCompatImageView image;
     MenuItem fav;
     String sug;
+
     Runnable tunsug = new Runnable() {
         public void run() {
             new getSuggestion().execute(sug.toString());
@@ -362,7 +363,6 @@ public class MainActivity extends AppCompatActivity {
             //   searchViewCompat.onActionViewCollapsed();
         }
     }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -390,9 +390,6 @@ public class MainActivity extends AppCompatActivity {
             LocalBroadcastManager.getInstance(this).registerReceiver(
                     mMessageReceiver, new IntentFilter("SongUpdation"));
 
-
-            //handleIntent(getIntent());
-
             //        ***********initiallizing small media player**********
 
 
@@ -403,8 +400,9 @@ public class MainActivity extends AppCompatActivity {
             myHandler = new Handler();
             myHandler.postDelayed(UpdateSongTime, 100);
 
+
         } catch (Exception e) {
-            Toast.makeText(getApplicationContext(), "Rorre occured" + e.toString(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), TAG + " Rorre occured" + e.toString(), Toast.LENGTH_LONG).show();
         }
 
     }
@@ -666,6 +664,7 @@ public void send_email(String text)
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+        mViewPager.setPageTransformer(true, new DepthPageTransformer());
         progressBar = (ProgressBar) findViewById(R.id.progressbars);
          tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setTabMode(TabLayout.MODE_FIXED);
@@ -675,7 +674,7 @@ public void send_email(String text)
         tabLayout.getTabAt(1).setIcon(R.drawable.ic_view_list_white_24dp);
         tabLayout.getTabAt(1).setText("");
 
-        mViewPager.setPageTransformer(true, new DepthPageTransformer());
+
         tabLayout.getTabAt(0).setIcon(R.drawable.ic_whatshot_white_24dp);
         tabLayout.getTabAt(0).setText("");
         TelephonyManager tm = (TelephonyManager) this.getSystemService(TELEPHONY_SERVICE);
@@ -842,12 +841,14 @@ public void send_email(String text)
 
     @Override
     protected void onDestroy() {
+
         super.onDestroy();
         try{
             mIsBound=false;
             doUnbindService();
             stopService(new Intent(this,MusicService.class));
         stop=true;
+            // Need to be included while using Mediation
             Glide.get(MainActivity.this).clearMemory();
 
        // doUnbindService();

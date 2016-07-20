@@ -1,11 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "24.0.0"
+    compileSdkVersion 24
+    buildToolsVersion '23.0.3'
 
     defaultConfig {
         applicationId "trevx.ptk.an.app"
+        multiDexEnabled true
         minSdkVersion 17
         targetSdkVersion 19
         versionCode 3
@@ -22,39 +23,29 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    releaseCompile 'com.android.support:appcompat-v7:23.4.0'
-    compile 'com.android.support:design:23.4.0'
-    compile 'com.android.support:support-v4:23.4.0'
-    compile 'com.android.support:recyclerview-v7:23.4.0'
-    compile 'com.android.support:cardview-v7:23.4.0'
+    releaseCompile 'com.android.support:appcompat-v7:24.0.0'
+    //compile 'com.google.android.gms:play-services-appindexing:8.1.0'
+    //  compile 'com.hkm.ui:ultimaterecyclerview:0.5.8'
+    // compile 'com.hannesdorfmann.smoothprogressbar:library:1.0.0'
+    compile project(path: ':library')
+    // compile 'com.github.lzyzsd:circleprogress:1.1.0@aar'
+
+
+    compile 'com.google.android.gms:play-services-ads:9.2.1'
+    compile 'com.android.support:design:24.1.0'
+    compile 'com.android.support:support-v4:24.1.0'
+    compile 'com.android.support:recyclerview-v7:24.1.0'
+    compile 'com.android.support:cardview-v7:24.1.0'
     compile 'com.melnykov:floatingactionbutton:1.2.0'
     compile 'org.adw.library:discrete-seekbar:1.0.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
-    compile 'com.github.lzyzsd:circleprogress:1.1.0@aar'
     compile 'com.github.liuguangqiang.swipeback:library:1.0.2@aar'
     compile 'com.github.brnunes:swipeablerecyclerview:1.0.2'
-    compile 'com.google.android.gms:play-services-appindexing:8.1.0'
     compile 'org.michaelevans.colorart:library:0.0.1'
     compile 'com.github.bumptech.glide:glide:3.5.2'
-    //  compile 'com.hkm.ui:ultimaterecyclerview:0.5.8'
     compile 'com.sa90.infiniterecyclerview:library:1.0'
     compile 'com.nikhilpanju.recyclerviewenhanced:recyclerviewenhanced:1.1.0'
-
-    compile 'com.hannesdorfmann.smoothprogressbar:library:1.0.0'
-
-
     compile 'com.github.gabrielemariotti.recyclerview:recyclerview-animators:0.3.0-SNAPSHOT@aar'
-
     compile 'com.nineoldandroids:library:2.4.0'
-    compile 'com.redbooth:SlidingDeck:1.0.0'
-
-    compile 'com.github.frankiesardo:linearlistview:1.0.1@aar'
-    //Optional: see how to use the utility.
-    compile 'com.ogaclejapan.smarttablayout:utils-v4:1.6.1@aar'
-
-    //Optional: see how to use the utility.
-    compile 'com.ogaclejapan.smarttablayout:utils-v13:1.6.1@aar'
-
-    compile project(path: ':library')
     compile 'junit:junit:4.12'
 }

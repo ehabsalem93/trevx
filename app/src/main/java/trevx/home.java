@@ -8,9 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.redbooth.SlidingDeck;
-
-import trevx.Song_Manager.Song;
 import trevx.Song_Manager.trevx_api.Suggesion;
 import trevx.com.trevx.R;
 
@@ -28,7 +25,8 @@ public class home extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    public static SlidingDeck slidingDeck;
+
+
     Context context;
     View view;
     // TODO: Rename and change types of parameters
@@ -61,16 +59,7 @@ public class home extends Fragment {
         if (Suggesion.Suggestionword != null) {
             ListViewAdapter f = new ListViewAdapter(MainActivity.context, Suggesion.Suggestionword);
 
-            slidingDeck.setAdapter(f);
-            slidingDeck.setAnimationDuration(5000);
 
-            slidingDeck.setSwipeEventListener(new SlidingDeck.SwipeEventListener() {
-                @Override
-                public void onSwipe(SlidingDeck parent, View item) {
-                    Song model = (Song) item.getTag();
-                    Suggesion.Suggestionword.remove(Suggesion.Suggestionword.size());
-                }
-            });
         }
     }
 
@@ -88,7 +77,6 @@ public class home extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_home2, container, false);
-        slidingDeck = (SlidingDeck) view.findViewById(R.id.slidingDeck);
         setApater();
         return view;
     }
