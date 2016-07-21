@@ -46,6 +46,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.riontech.staggeredtextgridview.StaggeredTextGridView;
 
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 
@@ -87,12 +88,12 @@ public class MainActivity extends AppCompatActivity {
 
     public static SearchViewLayout searchViewLayout;
     public static Context context;
+    public static SearchView searchViewCompat;
     final Messenger mMessenger = new Messenger(new IncomingHandler());
     ProgressBar progressBar1;
     boolean is_completed = false;
     home home;
     Favourite_Fragment favouriteFragment;
-    SearchView searchViewCompat;
     View view;
     TabLayout tabLayout;
     TextView Title, source;
@@ -217,24 +218,53 @@ public class MainActivity extends AppCompatActivity {
     };
     private Boolean exit = false;
 
-    public static void doSearchs(final String queryStr) {
+    public static void doSearch(final String queryStr) throws UnsupportedEncodingException, MalformedURLException {
         // get a Cursor, prepare the ListAdapter
         // and set it
         //Toast.makeText(getApplicationContext(),"your voice are"+queryStr,Toast.LENGTH_LONG).show();
         queryy = queryStr;
+        if (null != Search_Fragment.view) {
+            StaggeredTextGridView staggeredTextGridView = (StaggeredTextGridView) Search_Fragment.view.findViewById(R.id.staggeredTextView);
+            staggeredTextGridView.setVisibility(View.GONE);
+        }
         try {
-
+            searchViewCompat.setQuery(queryy, false);
         } catch (Exception e) {
 
         }
         mViewPager.setCurrentItem(1);
 
 
-        new get_Song_trevx().execute();
-        //   searchViewCompat.onActionViewCollapsed();
+        if (!Internet_connectivity.check_connection(context) && !Internet_connectivity.check_connection(context)) {
+            return;
+        } else {
+            new get_Song_trevx().execute();
+            //   new getSong().get_song(queryStr);
 
+            //   searchViewCompat.onActionViewCollapsed();
+        }
     }
 
+    /*
+        public static void doSearchs(final String queryStr) {
+
+            // get a Cursor, prepare the ListAdapter
+            // and set it
+            //Toast.makeText(getApplicationContext(),"your voice are"+queryStr,Toast.LENGTH_LONG).show();
+            queryy = queryStr;
+            try {
+
+            } catch (Exception e) {
+
+            }
+            mViewPager.setCurrentItem(1);
+
+
+            new get_Song_trevx().execute();
+            //   searchViewCompat.onActionViewCollapsed();
+
+        }
+    */
     private void CheckIfServiceIsRunning() {
         //If the service is running when the activity starts, we want to automatically bind to it.
         if (!MusicService.isRunning() && !mIsBound) {
@@ -341,28 +371,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void doSearch(final String queryStr) throws UnsupportedEncodingException, MalformedURLException {
-        // get a Cursor, prepare the ListAdapter
-        // and set it
-        //Toast.makeText(getApplicationContext(),"your voice are"+queryStr,Toast.LENGTH_LONG).show();
-        queryy = queryStr;
-        try {
-            searchViewCompat.setQuery(queryy, false);
-        } catch (Exception e) {
-
-        }
-        mViewPager.setCurrentItem(1);
-
-
-        if (!Internet_connectivity.check_connection(this) && !Internet_connectivity.check_connection(this)) {
-            return;
-        } else {
-            new get_Song_trevx().execute();
-            //   new getSong().get_song(queryStr);
-
-            //   searchViewCompat.onActionViewCollapsed();
-        }
-    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

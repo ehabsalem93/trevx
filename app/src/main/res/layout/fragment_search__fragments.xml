@@ -4,9 +4,9 @@
     android:id="@+id/main_content"
     android:layout_width="match_parent"
 
-
     android:layout_height="match_parent"
     android:alpha="0.9"
+    android:background="@color/White"
     tools:context="trevx.Search.Search_Fragment">
 
 
@@ -23,28 +23,18 @@
         android:layout_alignParentTop="true"
         android:scrollbars="vertical" />
 
-    <me.originqiu.library.EditTag
-        android:id="@+id/edit_tag_view"
+
+    <com.riontech.staggeredtextgridview.StaggeredTextGridView
+        android:id="@+id/staggeredTextView"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
-        app:delete_mode_bg="@color/red"
-        app:input_layout="@layout/view_sample_input_tag"
-        app:tag_layout="@layout/view_sample_tag" />
 
-    <eu.fiskur.chipcloud.ChipCloud xmlns:chipcloud="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/chip_cloud"
-        android:layout_width="match_parent"
-        android:layout_height="fill_parent"
-        android:layout_alignParentTop="true"
-        chipcloud:deselectTransitionMS="500"
-        chipcloud:deselectedColor="@color/colorPrimary"
-        chipcloud:deselectedFontColor="@color/White"
-        chipcloud:selectMode="required"
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        app:horizontalSpace="2dp"
+        app:isFitToScreen="false"
+        app:verticalSpace="4dp"
 
-        chipcloud:selectTransitionMS="750"
-
-        chipcloud:selectedColor="@color/colorAccent"
-        chipcloud:selectedFontColor="@color/White" />
+        />
 
 
 </RelativeLayout>

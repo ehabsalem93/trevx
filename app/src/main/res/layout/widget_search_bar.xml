@@ -41,9 +41,20 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@color/material_blue_600"
                     android:textColorHint="@color/colorPrimary"
                     android:textSize="@dimen/search_collapsed_text_size" />
+
+                <TextView
+                    android:id="@+id/search_box_collapsed_hint2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="2dp"
+                    android:gravity="center_vertical"
+                    android:text="             user query"
+                    android:textColor="@color/subtext"
+                    android:textColorHint="@color/colorPrimary"
+                    android:textSize="20dp" />
 
             </LinearLayout>
 

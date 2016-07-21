@@ -24,6 +24,7 @@
             android:layout_width="56dp"
             android:layout_height="match_parent"
             android:background="?attr/selectableItemBackgroundBorderless"
+
             android:src="@drawable/ic_arrow_back" />
 
         <EditText
@@ -50,12 +51,14 @@
             android:importantForAccessibility="no"
             android:src="@drawable/ic_search"
             android:tint="@color/searchbox_icon_tint"
+
             android:visibility="invisible"
             tools:visibility="visible" />
     </LinearLayout>
 
     <FrameLayout
         android:id="@+id/search_expanded_content"
+
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 </LinearLayout>

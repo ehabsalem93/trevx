@@ -14,8 +14,8 @@
     <color name="default_color_expanded">#F0F0F0</color>
 
 
-    <color name="colorPrimary">#e04f3e</color>
-    <color name="actionbar">#dd4433</color>
+    <color name="colorPrimary">#e95f5d</color>
+    <color name="actionbar">#e95f5d</color>
     <color name="listitem">#ededed</color>
     <color name="player">#bbbbbb</color>
     <color name="progress_fron">#dd4433</color>

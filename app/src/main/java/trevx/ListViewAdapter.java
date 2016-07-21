@@ -50,7 +50,7 @@ public class ListViewAdapter extends ArrayAdapter<String> {
             @Override
             public void onClick(View view) {
                 try {
-                    MainActivity.doSearchs(values.get(position));
+                    MainActivity.doSearch(values.get(position));
                     SearchStaticListSupportFragment.rootView.setVisibility(View.GONE);
                     MainActivity.searchViewLayout.collapse();
                 }catch(Exception e) {

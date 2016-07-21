@@ -4,7 +4,6 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -14,20 +13,14 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.nikhilpanju.recyclerviewenhanced.RecyclerTouchListener;
+import com.riontech.staggeredtextgridview.StaggeredTextGridView;
 
-import java.util.LinkedList;
-
-import eu.fiskur.chipcloud.ChipCloud;
 import it.gmariotti.recyclerview.itemanimator.SlideInOutRightItemAnimator;
-import me.originqiu.library.EditTag;
 import trevx.Musicplayer.MusicService;
 import trevx.Song_Manager.trevx_api.get_search_tag;
 import trevx.Song_Manager.trevx_api.get_song_trevx_fill;
-import trevx.Song_Manager.trevx_api.search_tag;
 import trevx.Song_Manager.trevx_api.trevx_api;
 import trevx.com.trevx.R;
 import trevx.util.Internet_connectivity;
@@ -48,11 +41,9 @@ public class Search_Fragment extends Fragment {
     public static boolean stop=false;
     public static Search_FRagment_Adapter adapter;
     public static int Song_count;
+    public static View view;
     static RecyclerView rv;
     public final String TAG = "search";
-    AppCompatImageView note;
-    View view;
-    TextView noresult;
     Context context;
     //song list variables
     //private ArrayList<Song> songList;
@@ -60,9 +51,7 @@ public class Search_Fragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private OnFragmentInteractionListener mListener;
-    private RecyclerTouchListener onTouchListener;
-    private EditTag editTagView;
+
 
     public Search_Fragment() {
         // Required empty public constructor
@@ -120,54 +109,16 @@ public class Search_Fragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_search__fragments, container, false);
         context = view.getContext();
 
-        search_tag.searched_tag_list = new LinkedList<>();
         new get_search_tag().execute();
         pull_request();
-        ChipCloud chipCloud = (ChipCloud) view.findViewById(R.id.chip_cloud);
-
-        String[] eh = new String[15];
-        Log.d(TAG, "siiiz " + search_tag.searched_tag_list.size());
-        for (int i = 0; i < 15; i++) {
-            //  tagStrings.add("test" + i);
-            Log.d(TAG, "search frgamenttag " + search_tag.searched_tag_list.get(i));
-            eh[i] = search_tag.searched_tag_list.get(i);
-            chipCloud.addChip(search_tag.searched_tag_list.get(i));
-        }
-
-
-        editTagView = (EditTag) view.findViewById(R.id.edit_tag_view);
-        // statusSwitchView = (SwitchCompat) getActivity().findViewById(R.id.status_switch);
-
-
-//         editTagView.setTagList(search_tag.searched_tag_list);
-
-        // statusSwitchView.setOnCheckedChangeListener(this);
-        editTagView.setEditable(false);
-
-//      editTagView.setTagList(search_tag.searched_tag_list);
 
 
 
 
-       /*     chipCloud.addChips(eh);
-        new ChipCloud.Configure()
-                .chipCloud(chipCloud)
 
-                .selectTransitionMS(500)
-                .deselectTransitionMS(250)
-                .labels(eh)
-                .mode(ChipCloud.Mode.MULTI)
-                .chipListener(new ChipListener() {
-                    @Override
-                    public void chipSelected(int index) {
-                        //...
-                    }
-                    @Override
-                    public void chipDeselected(int index) {
-                        //...
-                    }
-                })
-                .build();
+
+
+       /*
 */
             return view;
 
@@ -228,8 +179,7 @@ public class Search_Fragment extends Fragment {
         if(trevx_api.song_list != null)
         {
             if (trevx_api.song_list.size() > 0) {
-                noresult.setVisibility(View.GONE);
-                note.setVisibility(View.GONE);
+
                 adapter = new Search_FRagment_Adapter(trevx_api.song_list, context);
 
                 rv.setAdapter(adapter);
@@ -251,8 +201,8 @@ public class Search_Fragment extends Fragment {
                             //adapter.notifyDataSetChanged();
 
                         } else {
-                            noresult.setVisibility(View.VISIBLE);
-                            note.setVisibility(View.VISIBLE);
+                            StaggeredTextGridView staggeredTextGridView = (StaggeredTextGridView) Search_Fragment.view.findViewById(R.id.staggeredTextView);
+                            staggeredTextGridView.setVisibility(View.VISIBLE);
 
                         }
                     }
@@ -300,9 +250,8 @@ public class Search_Fragment extends Fragment {
                                 adapter.notifyDataSetChanged();
 
                             } else {
-                                noresult.setVisibility(View.VISIBLE);
-                                note.setVisibility(View.VISIBLE);
-
+                                StaggeredTextGridView staggeredTextGridView = (StaggeredTextGridView) Search_Fragment.view.findViewById(R.id.staggeredTextView);
+                                staggeredTextGridView.setVisibility(View.VISIBLE);
                             }
                         }
                     });
@@ -313,8 +262,8 @@ public class Search_Fragment extends Fragment {
         }else {
             //  Toast.makeText(context, "", Toast.LENGTH_LONG).show();
             // Snackbar.make(MainActivity.layout,"Ops, Error occured while retrieving data, try again ",Snackbar.LENGTH_SHORT).setActionTextColor(context.getResources().getColor(R.color.cardview_dark_background)).show();
-            noresult.setVisibility(View.VISIBLE);
-            note.setVisibility(View.VISIBLE);
+            StaggeredTextGridView staggeredTextGridView = (StaggeredTextGridView) Search_Fragment.view.findViewById(R.id.staggeredTextView);
+            staggeredTextGridView.setVisibility(View.VISIBLE);
         }
 
 

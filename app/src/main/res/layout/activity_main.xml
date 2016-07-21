@@ -80,6 +80,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/small_player_main"
         android:layout_below="@+id/appbar"
+        android:background="@color/White"
         android:visibility="visible" />
     <RelativeLayout
         android:id="@+id/small_player_main"

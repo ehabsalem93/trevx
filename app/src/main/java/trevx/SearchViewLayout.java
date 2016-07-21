@@ -217,7 +217,7 @@ public class SearchViewLayout extends FrameLayout {
         });
 
         mCollapsedDrawable = new ColorDrawable(ContextCompat.getColor(getContext(), android.R.color.transparent));
-        mExpandedDrawable = new ColorDrawable(ContextCompat.getColor(getContext(),R.color.actionbar));
+        mExpandedDrawable = new ColorDrawable(ContextCompat.getColor(getContext(), R.color.material_blue_600));
         mBackgroundTransition = new TransitionDrawable(new Drawable[]{mCollapsedDrawable, mExpandedDrawable});
         mBackgroundTransition.setCrossFadeEnabled(true);
 

@@ -31,6 +31,7 @@ public class trevx_api implements Serializable{
     private static final String TAG = "trevx api";
     public static LinkedList<Song> song_list;
     public static trevx_api trevxApi;
+    public static JSONArray Tag_Json_Array;
 
     public trevx_api() {
     }
@@ -98,7 +99,6 @@ public class trevx_api implements Serializable{
         Reader_Json(response);
     }
 
-
     public static void get_tag_api() throws IOException {
         //
         URL url = new URL("http://trevx.com/discover-api.php?type=search&lan=en&country=jo&order=random&limit=20");
@@ -161,7 +161,7 @@ public class trevx_api implements Serializable{
 
             search_tag.searched_tag_list = new LinkedList<>();
             JSONArray json = new JSONArray(JSON_Builder.toString());
-
+            Tag_Json_Array = json;
             JSONObject results;
 
             for (int i = 0; i < (json.length()); i++) {
