@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +15,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.daimajia.slider.library.Animations.DescriptionAnimation;
+import com.daimajia.slider.library.SliderLayout;
+import com.daimajia.slider.library.SliderTypes.BaseSliderView;
+import com.daimajia.slider.library.SliderTypes.TextSliderView;
+import com.daimajia.slider.library.Tricks.ViewPagerEx;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
@@ -32,16 +40,15 @@ import trevx.com.trevx.R;
  * Use the {@link home#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class home extends Fragment {
+public class home extends Fragment implements BaseSliderView.OnSliderClickListener, ViewPagerEx.OnPageChangeListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
-
     Context context;
     View view;
     SectionedRecyclerViewAdapter sectionAdapter;
+    private SliderLayout mDemoSlider;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -78,12 +85,32 @@ public class home extends Fragment {
     }
 
     @Override
+    public void onSliderClick(BaseSliderView slider) {
+        Toast.makeText(getActivity(), slider.getBundle().get("extra") + "", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        Log.d("Slider Demo", "Page Changed: " + position);
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+
     }
 
     @Override
@@ -94,6 +121,52 @@ public class home extends Fragment {
         //setApater();
 
 
+        mDemoSlider = (SliderLayout) view.findViewById(R.id.slider);
+
+        HashMap<String, String> url_maps = new HashMap<String, String>();
+        url_maps.put("Hannibal", "http://static2.hypable.com/wp-content/uploads/2013/12/hannibal-season-2-release-date.jpg");
+        url_maps.put("Big Bang Theory", "http://tvfiles.alphacoders.com/100/hdclearart-10.png");
+        url_maps.put("House of Cards", "http://cdn3.nflximg.net/images/3093/2043093.jpg");
+        url_maps.put("Game of Thrones", "http://images.boomsbeat.com/data/images/full/19640/game-of-thrones-season-4-jpg.jpg");
+
+        HashMap<String, Integer> file_maps = new HashMap<String, Integer>();
+        file_maps.put("Hannibal", R.drawable.trevx);
+        file_maps.put("Big Bang Theory", R.drawable.trevx);
+        file_maps.put("House of Cards", R.drawable.trevx);
+        file_maps.put("Game of Thrones", R.drawable.trevx);
+
+        for (String name : url_maps.keySet()) {
+            TextSliderView textSliderView = new TextSliderView(getActivity());
+            // initialize a SliderLayout
+            textSliderView
+                    .description(name)
+                    .image(url_maps.get(name))
+                    .setScaleType(BaseSliderView.ScaleType.Fit)
+                    .setOnSliderClickListener(new BaseSliderView.OnSliderClickListener() {
+                        @Override
+                        public void onSliderClick(BaseSliderView slider) {
+
+                        }
+                    });
+
+            //add your extra information
+            textSliderView.bundle(new Bundle());
+            textSliderView.getBundle()
+                    .putString("extra", name);
+
+            mDemoSlider.addSlider(textSliderView);
+        }
+        mDemoSlider.setPresetTransformer(SliderLayout.Transformer.Stack);
+        mDemoSlider.setPresetIndicator(SliderLayout.PresetIndicators.Center_Bottom);
+        mDemoSlider.setCustomAnimation(new DescriptionAnimation());
+        mDemoSlider.setDuration(4000);
+
+        mDemoSlider.addOnPageChangeListener(this);
+
+
+
+
+
         sectionAdapter = new SectionedRecyclerViewAdapter();
 
 
@@ -101,19 +174,23 @@ public class home extends Fragment {
         sectionAdapter.addSection(new MovieSection(getString(R.string.most_popular_movies_topic), getMostPopularMoviesList()));
 
 
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview);
+        final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview);
         GridLayoutManager glm = new GridLayoutManager(getContext(), 2);
+
         glm.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
                 switch (sectionAdapter.getSectionItemViewType(position)) {
                     case SectionedRecyclerViewAdapter.VIEW_TYPE_HEADER:
                         return 2;
+                    case SectionedRecyclerViewAdapter.VIEW_TYPE_FOOTER:
+                        return 2;
                     default:
                         return 1;
                 }
             }
         });
+
         recyclerView.setLayoutManager(glm);
         recyclerView.setAdapter(sectionAdapter);
 
@@ -126,23 +203,6 @@ public class home extends Fragment {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
         }
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-
-
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
     }
 
     private List<Movie> getTopRatedMoviesList() {
@@ -194,7 +254,7 @@ public class home extends Fragment {
         List<Movie> list;
 
         public MovieSection(String title, List<Movie> list) {
-            super(R.layout.section_4, R.layout.section_4_item);
+            super(R.layout.section_4, R.layout.section_4_footer, R.layout.section_4_item);
 
             this.title = title;
             this.list = list;
@@ -251,6 +311,24 @@ public class home extends Fragment {
                 }
             });
         }
+
+        @Override
+        public RecyclerView.ViewHolder getFooterViewHolder(View view) {
+            return super.getFooterViewHolder(view);
+        }
+
+        @Override
+        public void onBindFooterViewHolder(RecyclerView.ViewHolder holder) {
+            super.onBindFooterViewHolder(holder);
+//            FooterViewHolder footer= (FooterViewHolder) holder;
+         /*   ((FooterViewHolder) holder).btnMore.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Toast.makeText(getActivity(),"More clicked",Toast.LENGTH_LONG).show();
+                }
+            });*/
+
+        }
     }
 
     class HeaderViewHolder extends RecyclerView.ViewHolder {
@@ -262,6 +340,17 @@ public class home extends Fragment {
             super(view);
 
             tvTitle = (TextView) view.findViewById(R.id.tvTitle);
+            btnMore = (Button) view.findViewById(R.id.btnMore);
+        }
+    }
+
+    class FooterViewHolder extends RecyclerView.ViewHolder {
+
+        private final Button btnMore;
+
+        public FooterViewHolder(View view) {
+            super(view);
+
             btnMore = (Button) view.findViewById(R.id.btnMore);
         }
     }
@@ -282,6 +371,7 @@ public class home extends Fragment {
             tvSubItem = (TextView) view.findViewById(R.id.tvSubItem);
         }
     }
+
 
     class Movie {
         String name;

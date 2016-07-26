@@ -1,12 +1,28 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.melnykov.fab.ObservableScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/White"
     tools:context="trevx.home">
 
-    <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/recyclerview"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-</RelativeLayout>
+        android:layout_height="match_parent"
+
+        >
+
+        <com.daimajia.slider.library.SliderLayout
+            android:id="@+id/slider"
+        android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginBottom="10dp" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:layout_below="@+id/slider"
+            android:background="@color/White" />
+
+    </RelativeLayout>
+</com.melnykov.fab.ObservableScrollView>

@@ -17,7 +17,6 @@ import android.widget.ListView;
 import com.bumptech.glide.Glide;
 import com.riontech.staggeredtextgridview.StaggeredTextGridView;
 
-import it.gmariotti.recyclerview.itemanimator.SlideInOutRightItemAnimator;
 import trevx.Musicplayer.MusicService;
 import trevx.Song_Manager.trevx_api.get_search_tag;
 import trevx.Song_Manager.trevx_api.get_song_trevx_fill;
@@ -183,9 +182,6 @@ public class Search_Fragment extends Fragment {
                 adapter = new Search_FRagment_Adapter(trevx_api.song_list, context);
 
                 rv.setAdapter(adapter);
-                SlideInOutRightItemAnimator slideInOutRightItemAnimator = new SlideInOutRightItemAnimator(rv);
-                slideInOutRightItemAnimator.setAddDuration(5000);
-                rv.setItemAnimator(slideInOutRightItemAnimator);
                 adapter.setOnLoadMoreListener(new OnLoadMoreListnert() {
                     @Override
                     public void onLoadMore() {
@@ -223,9 +219,6 @@ public class Search_Fragment extends Fragment {
 
                     adapter = new Search_FRagment_Adapter(trevx_api.song_list, context);
                     rv.setAdapter(adapter);
-                    SlideInOutRightItemAnimator slideInOutRightItemAnimator = new SlideInOutRightItemAnimator(rv);
-                    slideInOutRightItemAnimator.setAddDuration(5000);
-                    rv.setItemAnimator(slideInOutRightItemAnimator);
                     rv.setHasFixedSize(true);
                     ;
                     adapter.setOnLoadMoreListener(new OnLoadMoreListnert() {
