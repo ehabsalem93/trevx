@@ -6,7 +6,7 @@ import android.os.Parcel;
  * Created by ptk on 4/25/16.
  */
 
-public class Song  {
+public class Song {
     public String title;
     public String id;
     public String Image;

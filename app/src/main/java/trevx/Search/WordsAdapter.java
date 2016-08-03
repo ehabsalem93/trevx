@@ -41,6 +41,8 @@ public class WordsAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
+        if (jArray == null)
+            return 0;
         return jArray.length();
     }
 

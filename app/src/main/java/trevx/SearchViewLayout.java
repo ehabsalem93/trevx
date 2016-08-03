@@ -105,11 +105,17 @@ public class SearchViewLayout extends FrameLayout {
         }
     };
     private TextView mCollapsedHintView;
+    private TextView querysearch;
     private TabLayout mTabLayout;
 
     public SearchViewLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         ANIMATION_DURATION = context.getResources().getInteger(R.integer.animation_duration);
+    }
+
+    public void setqueury(String query) {
+        querysearch = (TextView) findViewById(R.id.search_box_collapsed_hint2);
+        querysearch.setText(query);
     }
 
     public void setOnToggleAnimationListener(OnToggleAnimationListener listener) {

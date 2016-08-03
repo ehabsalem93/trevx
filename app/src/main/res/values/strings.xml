@@ -48,8 +48,9 @@
     <string name="biz_topic">Business</string>
     <string name="tech_topic">Technology</string>
     <string name="sports_topic">Sports</string>
-    <string name="top_rated_movies_topic">Top Rated Movies</string>
-    <string name="most_popular_movies_topic">Most Popular Movies</string>
+    <string name="top_rated_artist">Top Rated Artists</string>
+    <string name="top_rated_discovery">International Songs</string>
+    <string name="most_popular_Songs_topic">Most Popular Songs</string>
     <string name="more">MORE</string>
     <string name="see_more">See more..</string>
     <string name="failed_load">Failed to load, tap to try again.</string>

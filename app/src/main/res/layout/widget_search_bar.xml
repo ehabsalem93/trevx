@@ -51,10 +51,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginRight="2dp"
                     android:gravity="center_vertical"
-                    android:text="             user query"
+                    android:text="   user query"
                     android:textColor="@color/subtext"
                     android:textColorHint="@color/colorPrimary"
-                    android:textSize="20dp" />
+                    android:textSize="15dp" />
 
             </LinearLayout>
 

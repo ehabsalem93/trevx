@@ -2,14 +2,26 @@ package trevx.ptk.an.app;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ProgressBar;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.concurrent.ExecutionException;
 
 import trevx.MainActivity;
+import trevx.Song_Manager.trevx_api.get_search_tag;
+import trevx.Song_Manager.trevx_home_api;
 import trevx.com.trevx.R;
+import trevx.trevx_home_api.home_artist;
+import trevx.trevx_home_api.home_category;
+import trevx.trevx_home_api.home_song;
+import trevx.trevx_home_api.home_word_discovery;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -33,6 +45,9 @@ public class FullscreenActivity extends Activity {
      * and a change of the status and navigation bar.
      */
     private static final int UI_ANIMATION_DELAY = 300;
+    private static final String TAG = "Full Screen";
+    public static Context context;
+    public static ProgressBar progressBar;
     private final Handler mHideHandler = new Handler();
     private View mContentView;
     private final Runnable mHidePart2Runnable = new Runnable() {
@@ -53,26 +68,39 @@ public class FullscreenActivity extends Activity {
         }
     };
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
+        context = this;
         setContentView(R.layout.activity_fullscreen);
+        progressBar = (ProgressBar) findViewById(R.id.progressbars);
+
+        home_category.categories = new ArrayList<>();
+        home_song.home_song_list = new LinkedList<>();
+        home_artist.home_atists = new ArrayList<>();
+        home_word_discovery.home_word_discovery_list = new ArrayList<>();
+
+
         new Handler().postDelayed(new Runnable() {
-
-            // Using handler with postDelayed called runnable run method
-
             @Override
             public void run() {
+                try {
+                    new trevx_home_api().execute().get();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+
+
+                new get_search_tag().execute();
                 Intent i = new Intent(FullscreenActivity.this, MainActivity.class);
                 startActivity(i);
-
-                // close this activity
                 finish();
             }
-        }, 3 * 1000); // wait for 5 seconds
+        }, 5 * 1000);
+
 
     }
 

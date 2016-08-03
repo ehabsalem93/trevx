@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -20,6 +21,10 @@ import java.util.logging.Logger;
 
 import trevx.Search.Search_Fragment;
 import trevx.Song_Manager.Song;
+import trevx.trevx_home_api.home_artist;
+import trevx.trevx_home_api.home_category;
+import trevx.trevx_home_api.home_song;
+import trevx.trevx_home_api.home_word_discovery;
 
 
 /**
@@ -156,7 +161,7 @@ public class trevx_api implements Serializable{
     }
 
     public static void Reader_tag_json(StringBuilder JSON_Builder) {
-        // ArrayList<Song> song_list=new ArrayList<>();
+        //ArrayList<Song> song_list=new ArrayList<>();
         try {
 
             search_tag.searched_tag_list = new LinkedList<>();
@@ -185,5 +190,74 @@ public class trevx_api implements Serializable{
             Logger.getLogger(trevx_api.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+    }
+
+    public static void get_home_api() {
+        Log.d(TAG, "start loading url .......");
+        URL url = null;
+        try {
+            url = new URL("http://trevx.com/discover-api.php?type=all&lan=en&country=jo&order=random&categories_limit=6&songs_limit=6&artists_limit=6&world_discover_limit=6");
+
+            Log.d(TAG, "Loading home content through intenrnet connection .......");
+
+            // URL url = new URL("http://trevx.com/v1/"+query+"/1/40/?format=json");
+            URLConnection connection = url.openConnection();
+            connection.setConnectTimeout(10000);
+            // connection.setRequestProperty("Authorization", "Basic " + );
+            String inputLine;
+            StringBuilder response = new StringBuilder();
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+
+            }
+            Log.d(TAG, "response is" + response.toString());
+
+            Reader_home_json(response);
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            Log.d(TAG, "home -> Malformed Excpetion is " + e.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.d(TAG, "home -> IOExcpetion is " + e.toString());
+        }
+
+
+    }
+
+    private static void Reader_home_json(StringBuilder response) {
+
+        try {
+            JSONObject jsonObject = new JSONObject(String.valueOf(response));
+            JSONArray songs = jsonObject.getJSONArray("songs");
+            JSONArray cat = jsonObject.getJSONArray("categories");
+            JSONArray artists = jsonObject.getJSONArray("artists");
+            JSONArray word_discovery = jsonObject.getJSONArray("world_discover");
+            for (int x = 0; x < songs.length(); x++) {
+                home_song.add_song(new Song(songs.getJSONObject(x).getString("title"), songs.getJSONObject(x).getString("id"), songs.getJSONObject(x).getString("image"), songs.getJSONObject(x).getString("link")));
+
+            }
+
+            for (int x = 0; x < cat.length(); x++) {
+                home_category.add_to_category_list(cat.getJSONObject(x).getString("id"), cat.getJSONObject(x).getString("Qtitle"), cat.getJSONObject(x).getString("Searchq"), cat.getJSONObject(x).getString("Imgurl"));
+                Log.d(TAG, "whome category --->" + cat.getJSONObject(x).getString("Qtitle"));
+            }
+
+            for (int x = 0; x < artists.length(); x++) {
+                home_artist.add_to_home_artist(artists.getJSONObject(x).getString("id"), artists.getJSONObject(x).getString("Qtitle"), artists.getJSONObject(x).getString("Searchq"), artists.getJSONObject(x).getString("Imgurl"));
+                Log.d(TAG, "whome artist --->" + artists.getJSONObject(x).getString("Qtitle"));
+            }
+
+            for (int x = 0; x < word_discovery.length(); x++) {
+                home_word_discovery.add_to_home_word_discovery(word_discovery.getJSONObject(x).getString("id"), word_discovery.getJSONObject(x).getString("Qtitle"), word_discovery.getJSONObject(x).getString("Searchq"), word_discovery.getJSONObject(x).getString("Imgurl"));
+                Log.d(TAG, "word discovery --->" + word_discovery.getJSONObject(x).getString("Qtitle"));
+            }
+
+            Log.d(TAG, new home_song().toString());
+            Log.d(TAG, "Reader home_jsonme" + cat.get(0));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }

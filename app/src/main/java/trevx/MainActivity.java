@@ -66,6 +66,7 @@ import trevx.Song_Manager.trevx_api.Suggesion;
 import trevx.Song_Manager.trevx_api.getSuggestion;
 import trevx.com.trevx.R;
 import trevx.full_Music_PLayer.media_player_visual;
+import trevx.home.home;
 import trevx.util.Internet_connectivity;
 import trevx.util.String_ytil;
 
@@ -92,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
     final Messenger mMessenger = new Messenger(new IncomingHandler());
     ProgressBar progressBar1;
     boolean is_completed = false;
-    home home;
+    trevx.home.home home;
     Favourite_Fragment favouriteFragment;
     View view;
     TabLayout tabLayout;
@@ -223,6 +224,8 @@ public class MainActivity extends AppCompatActivity {
         // and set it
         //Toast.makeText(getApplicationContext(),"your voice are"+queryStr,Toast.LENGTH_LONG).show();
         queryy = queryStr;
+        searchViewLayout.setqueury("  " + queryStr);
+
         if (null != Search_Fragment.view) {
             StaggeredTextGridView staggeredTextGridView = (StaggeredTextGridView) Search_Fragment.view.findViewById(R.id.staggeredTextView);
             staggeredTextGridView.setVisibility(View.GONE);
@@ -392,6 +395,7 @@ public class MainActivity extends AppCompatActivity {
             ;
             Suggesion.Suggestionword = new ArrayList<String>();
 
+
             //        ***********initiallizing the main component of the application**********
             init_whole_app_interface();
 
@@ -428,7 +432,7 @@ public class MainActivity extends AppCompatActivity {
         searchViewLayout.setCollapsedHint(getApplicationContext(),"trevx");
 
         searchViewLayout.setExpandedHint("Search trevx...");
-
+        searchViewLayout.setqueury("");
 //        searchViewLayout.setHint("Global Hint");
 
         ColorDrawable collapsed = new ColorDrawable(ContextCompat.getColor(this,R.color.colorPrimary));

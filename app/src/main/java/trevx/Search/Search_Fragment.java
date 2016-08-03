@@ -18,7 +18,6 @@ import com.bumptech.glide.Glide;
 import com.riontech.staggeredtextgridview.StaggeredTextGridView;
 
 import trevx.Musicplayer.MusicService;
-import trevx.Song_Manager.trevx_api.get_search_tag;
 import trevx.Song_Manager.trevx_api.get_song_trevx_fill;
 import trevx.Song_Manager.trevx_api.trevx_api;
 import trevx.com.trevx.R;
@@ -41,6 +40,7 @@ public class Search_Fragment extends Fragment {
     public static Search_FRagment_Adapter adapter;
     public static int Song_count;
     public static View view;
+    public static WordsAdapter adapter2;
     static RecyclerView rv;
     public final String TAG = "search";
     Context context;
@@ -50,7 +50,6 @@ public class Search_Fragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-
 
     public Search_Fragment() {
         // Required empty public constructor
@@ -107,8 +106,10 @@ public class Search_Fragment extends Fragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_search__fragments, container, false);
         context = view.getContext();
+        StaggeredTextGridView staggeredTextGridView = (StaggeredTextGridView) Search_Fragment.view.findViewById(R.id.staggeredTextView);
+        if (adapter2 != null)
+            staggeredTextGridView.setAdapter(adapter2);
 
-        new get_search_tag().execute();
         pull_request();
 
 

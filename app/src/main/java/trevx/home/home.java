@@ -1,4 +1,4 @@
-package trevx;
+package trevx.home;
 
 import android.content.Context;
 import android.net.Uri;
@@ -20,16 +20,23 @@ import com.daimajia.slider.library.SliderLayout;
 import com.daimajia.slider.library.SliderTypes.BaseSliderView;
 import com.daimajia.slider.library.SliderTypes.TextSliderView;
 import com.daimajia.slider.library.Tricks.ViewPagerEx;
+import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.util.LinkedList;
 import java.util.List;
 
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
 import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection;
-import trevx.Song_Manager.trevx_api.Suggesion;
+import trevx.MainActivity;
+import trevx.Song_Manager.Song;
 import trevx.com.trevx.R;
+import trevx.trevx_home_api.home_api;
+import trevx.trevx_home_api.home_artist;
+import trevx.trevx_home_api.home_category;
+import trevx.trevx_home_api.home_song;
+import trevx.trevx_home_api.home_word_discovery;
 
 
 /**
@@ -45,9 +52,10 @@ public class home extends Fragment implements BaseSliderView.OnSliderClickListen
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    Context context;
     View view;
     SectionedRecyclerViewAdapter sectionAdapter;
+    Context context;
+    MainActivity activity;
     private SliderLayout mDemoSlider;
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -74,14 +82,6 @@ public class home extends Fragment implements BaseSliderView.OnSliderClickListen
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
-    }
-
-    public static void setApater() {
-        if (Suggesion.Suggestionword != null) {
-            ListViewAdapter f = new ListViewAdapter(MainActivity.context, Suggesion.Suggestionword);
-
-
-        }
     }
 
     @Override
@@ -119,59 +119,56 @@ public class home extends Fragment implements BaseSliderView.OnSliderClickListen
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_home2, container, false);
         //setApater();
-
-
+        activity = (MainActivity) MainActivity.context;
         mDemoSlider = (SliderLayout) view.findViewById(R.id.slider);
 
-        HashMap<String, String> url_maps = new HashMap<String, String>();
-        url_maps.put("Hannibal", "http://static2.hypable.com/wp-content/uploads/2013/12/hannibal-season-2-release-date.jpg");
-        url_maps.put("Big Bang Theory", "http://tvfiles.alphacoders.com/100/hdclearart-10.png");
-        url_maps.put("House of Cards", "http://cdn3.nflximg.net/images/3093/2043093.jpg");
-        url_maps.put("Game of Thrones", "http://images.boomsbeat.com/data/images/full/19640/game-of-thrones-season-4-jpg.jpg");
-
-        HashMap<String, Integer> file_maps = new HashMap<String, Integer>();
-        file_maps.put("Hannibal", R.drawable.trevx);
-        file_maps.put("Big Bang Theory", R.drawable.trevx);
-        file_maps.put("House of Cards", R.drawable.trevx);
-        file_maps.put("Game of Thrones", R.drawable.trevx);
-
-        for (String name : url_maps.keySet()) {
+        if (null == home_category.categories)
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        for (int x = 0; x < home_category.categories.size(); x++) {
             TextSliderView textSliderView = new TextSliderView(getActivity());
             // initialize a SliderLayout
+            final int finalX = x;
             textSliderView
-                    .description(name)
-                    .image(url_maps.get(name))
+                    .description(home_category.categories.get(x).getQtitle())
+                    .image(home_category.categories.get(x).getImagelink())
                     .setScaleType(BaseSliderView.ScaleType.Fit)
                     .setOnSliderClickListener(new BaseSliderView.OnSliderClickListener() {
                         @Override
                         public void onSliderClick(BaseSliderView slider) {
-
+                            try {
+                                activity.doSearch(home_category.categories.get(finalX).getSearchq());
+                            } catch (UnsupportedEncodingException e) {
+                                e.printStackTrace();
+                            } catch (MalformedURLException e) {
+                                e.printStackTrace();
+                            }
                         }
                     });
 
             //add your extra information
             textSliderView.bundle(new Bundle());
             textSliderView.getBundle()
-                    .putString("extra", name);
+                    .putString("extra", home_category.categories.get(x).getQtitle());
 
             mDemoSlider.addSlider(textSliderView);
         }
         mDemoSlider.setPresetTransformer(SliderLayout.Transformer.Stack);
         mDemoSlider.setPresetIndicator(SliderLayout.PresetIndicators.Center_Bottom);
         mDemoSlider.setCustomAnimation(new DescriptionAnimation());
-        mDemoSlider.setDuration(4000);
+        mDemoSlider.setDuration(2000);
 
         mDemoSlider.addOnPageChangeListener(this);
 
-
-
-
-
         sectionAdapter = new SectionedRecyclerViewAdapter();
+        sectionAdapter.addSection(new SongSection(getString(R.string.most_popular_Songs_topic), home_song.home_song_list));
+        sectionAdapter.addSection(new ArtistSection(getString(R.string.top_rated_artist), home_artist.getHome_atists()));
+        sectionAdapter.addSection(new ArtistSection(getString(R.string.top_rated_discovery), home_word_discovery.getHome_word_discovery_list()));
 
-
-        sectionAdapter.addSection(new MovieSection(getString(R.string.top_rated_movies_topic), getTopRatedMoviesList()));
-        sectionAdapter.addSection(new MovieSection(getString(R.string.most_popular_movies_topic), getMostPopularMoviesList()));
+        //   sectionAdapter.addSection(new ArtistSection(getString(R.string.most_popular_Songs_topic), getMostPopularMoviesList()));
 
 
         final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview);
@@ -205,33 +202,6 @@ public class home extends Fragment implements BaseSliderView.OnSliderClickListen
         }
     }
 
-    private List<Movie> getTopRatedMoviesList() {
-        List<String> arrayList = new ArrayList<>(Arrays.asList(getResources()
-                .getStringArray(R.array.top_rated_movies)));
-
-        List<Movie> movieList = new ArrayList<>();
-
-        for (String str : arrayList) {
-            String[] array = str.split("\\|");
-            movieList.add(new Movie(array[0], array[1]));
-        }
-
-        return movieList;
-    }
-
-    private List<Movie> getMostPopularMoviesList() {
-        List<String> arrayList = new ArrayList<>(Arrays.asList(getResources()
-                .getStringArray(R.array.most_popular_movies)));
-
-        List<Movie> movieList = new ArrayList<>();
-
-        for (String str : arrayList) {
-            String[] array = str.split("\\|");
-            movieList.add(new Movie(array[0], array[1]));
-        }
-
-        return movieList;
-    }
 
     /**
      * This interface must be implemented by activities that contain this
@@ -248,13 +218,13 @@ public class home extends Fragment implements BaseSliderView.OnSliderClickListen
         void onFragmentInteraction(Uri uri);
     }
 
-    class MovieSection extends StatelessSection {
+    class ArtistSection extends StatelessSection {
 
         String title;
-        List<Movie> list;
+        List<home_api> list;
 
-        public MovieSection(String title, List<Movie> list) {
-            super(R.layout.section_4, R.layout.section_4_footer, R.layout.section_4_item);
+        public ArtistSection(String title, List<home_api> list) {
+            super(R.layout.section_4, R.layout.section_4_item);
 
             this.title = title;
             this.list = list;
@@ -271,22 +241,30 @@ public class home extends Fragment implements BaseSliderView.OnSliderClickListen
         }
 
         @Override
-        public void onBindItemViewHolder(RecyclerView.ViewHolder holder, int position) {
+        public void onBindItemViewHolder(RecyclerView.ViewHolder holder, final int position) {
             final ItemViewHolder itemHolder = (ItemViewHolder) holder;
 
-            String name = list.get(position).getName();
-            String category = list.get(position).getCategory();
+            String name = list.get(position).getQtitle();
+   
 
             itemHolder.tvItem.setText(name);
-            itemHolder.tvSubItem.setText(category);
-            //  itemHolder.imgItem.setImageResource(R.drawable.trevx);
 
+            //  itemHolder.imgItem.setImageResource(R.drawable.trevx);
+            Picasso.with(getActivity()).load(list.get(position).getImagelink()).fit().into(itemHolder.imgItem);
             itemHolder.rootView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Toast.makeText(getContext(), String.format("Clicked on position #%s of Section %s",
                             sectionAdapter.getSectionPosition(itemHolder.getAdapterPosition()), title),
                             Toast.LENGTH_SHORT).show();
+
+                    try {
+                        activity.doSearch(list.get(position).getSearchq());
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    }
                 }
             });
         }
@@ -331,6 +309,102 @@ public class home extends Fragment implements BaseSliderView.OnSliderClickListen
         }
     }
 
+    class SongSection extends StatelessSection {
+
+        String title;
+        LinkedList<Song> list;
+
+
+        public SongSection(String title, LinkedList<Song> list) {
+            //  super(R.layout.section_4, R.layout.section_4_footer, R.layout.section_4_song);
+            super(R.layout.section_4, R.layout.section_4_song);
+
+            this.title = title;
+            this.list = list;
+        }
+
+
+        @Override
+        public int getContentItemsTotal() {
+
+            return list.size();
+        }
+
+        @Override
+        public RecyclerView.ViewHolder getItemViewHolder(View view) {
+            return new ItemViewHolder(view);
+        }
+
+        @Override
+        public void onBindItemViewHolder(RecyclerView.ViewHolder holder, final int position) {
+            final ItemViewHolder itemHolder = (ItemViewHolder) holder;
+
+            {
+                String name = list.get(position).getTitle();
+
+
+                itemHolder.tvItem.setText(name);
+//if(list.get(position).getImage()!=null)
+                try {
+                    Picasso.with(getActivity()).load(list.get(position).getImage()).error(R.drawable.trevx).fit().into(itemHolder.imgItem);
+                } catch (Exception e) {
+                    Picasso.with(getActivity()).load(R.drawable.brand).fit().into(itemHolder.imgItem);
+                }
+                itemHolder.rootView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+          /*  Toast.makeText(getContext(), String.format("Clicked on position #%s of Section %s",
+                    sectionAdapter.getSectionPosition(itemHolder.getAdapterPosition()), title),
+                    Toast.LENGTH_SHORT).show();*/
+                        activity.configure_small_player(list.get(position).getId(), list.get(position).getTitle(), list.get(position).getLink(), list.get(position).getImage(), list);
+
+                    }
+                });
+
+            }
+        }
+
+        @Override
+        public RecyclerView.ViewHolder getHeaderViewHolder(View view) {
+            return new HeaderViewHolder(view);
+        }
+
+        @Override
+        public void onBindHeaderViewHolder(RecyclerView.ViewHolder holder) {
+            HeaderViewHolder headerHolder = (HeaderViewHolder) holder;
+
+            headerHolder.tvTitle.setText(title);
+
+            headerHolder.btnMore.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getContext(), String.format("Clicked on more button from the header of Section %s",
+                            title),
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+        @Override
+        public RecyclerView.ViewHolder getFooterViewHolder(View view) {
+            return super.getFooterViewHolder(view);
+        }
+
+        @Override
+        public void onBindFooterViewHolder(RecyclerView.ViewHolder holder) {
+            super.onBindFooterViewHolder(holder);
+//            FooterViewHolder footer= (FooterViewHolder) holder;
+         /*   ((FooterViewHolder) holder).btnMore.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Toast.makeText(getActivity(),"More clicked",Toast.LENGTH_LONG).show();
+                }
+            });*/
+
+        }
+    }
+
+
     class HeaderViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView tvTitle;
@@ -359,8 +433,9 @@ public class home extends Fragment implements BaseSliderView.OnSliderClickListen
 
         private final View rootView;
         private final ImageView imgItem;
+        private final ImageView playitem;
         private final TextView tvItem;
-        private final TextView tvSubItem;
+
 
         public ItemViewHolder(View view) {
             super(view);
@@ -368,34 +443,11 @@ public class home extends Fragment implements BaseSliderView.OnSliderClickListen
             rootView = view;
             imgItem = (ImageView) view.findViewById(R.id.imgItem);
             tvItem = (TextView) view.findViewById(R.id.tvItem);
-            tvSubItem = (TextView) view.findViewById(R.id.tvSubItem);
+            playitem = (ImageView) view.findViewById(R.id.ic_play);
+
         }
     }
 
 
-    class Movie {
-        String name;
-        String category;
 
-        public Movie(String name, String category) {
-            this.name = name;
-            this.category = category;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getCategory() {
-            return category;
-        }
-
-        public void setCategory(String category) {
-            this.category = category;
-        }
-    }
 }
